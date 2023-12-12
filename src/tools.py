@@ -1,6 +1,6 @@
-#inlude ../constants.py
+from constants import *
 
-print("hello")
-def incr_reg(a):
-	pass
+def incr(a):
+	# TODO
+	return a
 
