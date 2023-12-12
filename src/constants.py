@@ -1,3 +1,6 @@
+# NE PAS TOUCHER
+from carotte.lib_carotte import *
+
 OPCODE_BITS = 5
 ALU_BITS = 5
 REG_BITS = 5
