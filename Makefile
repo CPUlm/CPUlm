@@ -1,5 +1,5 @@
 all: main.py
-	./carotte.py/carotte.py main.py
+	python3 ./carotte.py/carotte.py main.py
 
 clean:
 	rm __pycache__ -r
