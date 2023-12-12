@@ -7,17 +7,41 @@ allow_ribbon_logic_operations(True)
 def main():
     pc_old = Reg(Defer(5, lambda: pc))
 
-    write_ram_enable_copy = Reg(Defer(1, lambda: write_ram_enable))
-    write_ram_addr_copy = Reg(Defer(REG_BITS, lambda: write_ram_addr_copy))
-    write_ram_value_copy = Reg(Defer(WORD_SIZE, lambda: write_ram_value_copy))
-
-    instruction = RAM(REG_BITS, WORD_SIZE, pc_old, write_ram_enable_copy, write_ram_addr_copy, write_ram_value_copy)
-
-    # n'importe quoi pour tout declarer
-    pc = incr(pc_old)
+    reg_old =   ( Reg(Defer(REG_BITS, lambda: r2)),
+                  Reg(Defer(REG_BITS, lambda: r3)),
+                  Reg(Defer(REG_BITS, lambda: r4)),
+                  Reg(Defer(REG_BITS, lambda: r5)) )
+	
+    flags_old = ( Reg(Defer(REG_BITS, lambda: flag_z)),
+                  Reg(Defer(REG_BITS, lambda: flag_n)),
+                  Reg(Defer(REG_BITS, lambda: flag_c)),
+                  Reg(Defer(REG_BITS, lambda: flag_v)) )
 	 
-    write_ram_enable = ~write_ram_enable_copy
-    write_ram_addr = ~write_ram_addr_copy
-    write_ram_value = ~write_ram_value_copy
+
+    instruction = ROM(REG_BITS, WORD_SIZE, pc_old)
+    opcode = instruction[0 : OPCODE_BITS]
+
+    # calcul du resultat pour chaque instruction possible
+    # chacune renvoie un n-uplet contenant les nouvelles valeur de :
+    # (pc, regs, ram_actions, flags )
+
+    """
+    alu_set = alu(instruction, ........)
+    shift_set = shift(instruction,.....)
+    load_store_set = load(instruction,....)
+    jmp_set = jmp(instruction,....)
+    """
+
+    # selection du resultat grace a l'opcode et les resultats recus
+
+    r2 = reg_old[0]
+    r3 = reg_old[1]
+    r4 = reg_old[2]
+    r5 = reg_old[3]
+    flag_z = flags_old[0]
+    flag_n = flags_old[1]
+    flag_c = flags_old[2]
+    flag_v = flags_old[3]
+    pc = incr(pc_old)
 
     instruction.set_as_output("instruction")
