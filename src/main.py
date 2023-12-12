@@ -1,5 +1,9 @@
 from constants import *
 from tools import *
+from alu import *
+from shift import *
+from load_store import *
+from jmp import *
 
 allow_ribbon_logic_operations(True)
 
@@ -7,7 +11,7 @@ allow_ribbon_logic_operations(True)
 def main():
     pc_old = Reg(Defer(5, lambda: pc))
 
-    reg_old =   ( Reg(Defer(REG_BITS, lambda: r2)),
+    regs_old =   ( Reg(Defer(REG_BITS, lambda: r2)),
                   Reg(Defer(REG_BITS, lambda: r3)),
                   Reg(Defer(REG_BITS, lambda: r4)),
                   Reg(Defer(REG_BITS, lambda: r5)) )
@@ -22,22 +26,19 @@ def main():
     opcode = instruction[0 : OPCODE_BITS]
 
     # calcul du resultat pour chaque instruction possible
-    # chacune renvoie un n-uplet contenant les nouvelles valeur de :
-    # (pc, regs, ram_actions, flags )
+    # chacune renvoie un n-uplet contenant les nouvelles valeur
 
-    """
-    alu_set = alu(instruction, ........)
-    shift_set = shift(instruction,.....)
-    load_store_set = load(instruction,....)
-    jmp_set = jmp(instruction,....)
-    """
+    alu_set = alu(instruction, regs_old)                     # renvoie (regs, flags)
+    shift_set = shift(instruction, regs_old)                 # renvoie (regs) sous forme de 1-uplet
+    load_store_set = load_store(instruction, regs_old)             # renvoie (regs)
+    jmp_set = jmp(instruction, regs_old, flags_old, pc_old)  # renvoie (regs, pc)
 
     # selection du resultat grace a l'opcode et les resultats recus
 
-    r2 = reg_old[0]
-    r3 = reg_old[1]
-    r4 = reg_old[2]
-    r5 = reg_old[3]
+    r2 = regs_old[0]
+    r3 = regs_old[1]
+    r4 = regs_old[2]
+    r5 = regs_old[3]
     flag_z = flags_old[0]
     flag_n = flags_old[1]
     flag_c = flags_old[2]

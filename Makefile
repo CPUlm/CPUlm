@@ -4,6 +4,6 @@ all: src/main.py
 	@sed -i "s|lib_carotte|carotte\.lib_carotte|g" src/constants.py
 
 clean:
-	rm __pycache__ -r
-	rm carotte.py/__pycache__ -r
+	-rm src/__pycache__ -r
+	-rm carotte/__pycache__ -r
 
