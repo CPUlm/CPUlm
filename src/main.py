@@ -16,10 +16,10 @@ def main():
                   Reg(Defer(REG_BITS, lambda: r4)),
                   Reg(Defer(REG_BITS, lambda: r5)) )
 
-    flags_old = ( Reg(Defer(REG_BITS, lambda: flag_z)),
-                  Reg(Defer(REG_BITS, lambda: flag_n)),
-                  Reg(Defer(REG_BITS, lambda: flag_c)),
-                  Reg(Defer(REG_BITS, lambda: flag_v)) )
+    flags_old = ( Reg(Defer(1, lambda: flag_z)),
+                  Reg(Defer(1, lambda: flag_n)),
+                  Reg(Defer(1, lambda: flag_c)),
+                  Reg(Defer(1, lambda: flag_v)) )
  
 
     instruction = ROM(REG_BITS, WORD_SIZE, pc_old)
@@ -44,7 +44,7 @@ def main():
     flag_c = flags[2]
     flag_v = flags[3]
 
-    regs = select_opcode(opcode, alu_set[0], shift_set[0], load_store_set[0], jmp_set[0])
+    regs = mux_opcode(opcode, alu_set[0], shift_set[0], load_store_set[0], jmp_set[0])
     r2 = regs[0]
     r3 = regs[1]
     r4 = regs[2]
