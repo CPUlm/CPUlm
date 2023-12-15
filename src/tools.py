@@ -20,6 +20,23 @@ def mux_tuple(m, a, b):
     for (u,v) in zip(a,b):
         result.append(mux_tuple(m, u, v))
     return tuple(result)
+
+def get_reg(regId, regs):
+    # TODO adapter a plus de 4 regs
+    return Mux(regId[0],
+            Mux(regId[2], regs[0], regs[2]),
+            Mux(regId[2], regs[1], regs[3]))
+
+def update_regs(regs_old, id_reg, regVal):
+    # TODO adapter a plus de 4 reg
+    result2 = (regVal, regs_old[1], regs_old[2], regs_old[3])
+    result3 = (regs_old[0], regVal, regs_old[2], regs_old[3])
+    result4 = (regs_old[0], regs_old[1], regVal, regs_old[3])
+    result5 = (regs_old[0], regs_old[1], regs_old[2], regVal)
+    return mux_tuple(id_reg[0],
+            mux_tuple(id_reg[2], result2, result4),
+            mux_tuple(id_reg[2], result3, result5))
+    
     
 def full_adder(a, b, c):
     tmp = a ^ b
