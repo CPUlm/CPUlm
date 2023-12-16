@@ -36,7 +36,10 @@ def update_regs(regs_old, id_reg, regVal):
     return mux_tuple(id_reg[0],
             mux_tuple(id_reg[2], result2, result4),
             mux_tuple(id_reg[2], result3, result5))
-    
+
+def test_flags(flags, flagsMask):
+    # TODO
+    return Constant("1")
     
 def full_adder(a, b, c):
     tmp = a ^ b

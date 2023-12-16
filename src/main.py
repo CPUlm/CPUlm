@@ -9,12 +9,12 @@ allow_ribbon_logic_operations(True)
 
 
 def main():
-    pc_old = Reg(Defer(5, lambda: pc))
+    pc_old = Reg(Defer(WORD_SIZE, lambda: pc))
 
-    regs_old =   ( Reg(Defer(REG_BITS, lambda: r2)),
-                  Reg(Defer(REG_BITS, lambda: r3)),
-                  Reg(Defer(REG_BITS, lambda: r4)),
-                  Reg(Defer(REG_BITS, lambda: r5)) )
+    regs_old =   ( Reg(Defer(WORD_SIZE, lambda: r2)),
+                  Reg(Defer(WORD_SIZE, lambda: r3)),
+                  Reg(Defer(WORD_SIZE, lambda: r4)),
+                  Reg(Defer(WORD_SIZE, lambda: r5)) )
 
     flags_old = ( Reg(Defer(1, lambda: flag_z)),
                   Reg(Defer(1, lambda: flag_n)),
@@ -22,7 +22,7 @@ def main():
                   Reg(Defer(1, lambda: flag_v)) )
  
 
-    instruction = ROM(REG_BITS, WORD_SIZE, pc_old)
+    instruction = ROM(WORD_SIZE, WORD_SIZE, pc_old)
     opcode = instruction[0 : OPCODE_BITS]
 
     # calcul du resultat pour chaque instruction possible
