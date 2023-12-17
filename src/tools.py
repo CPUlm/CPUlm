@@ -63,14 +63,14 @@ def incr(a):
     return s
 
 def mux_jmp(opcode, not_jmp, is_jmp):
-    # Peut être facilement ameliore
     assert_same_type(not_jmp, not_jmp)
-    return mux_opcode(opcode, not_jmp, not_jmp, not_jmp, is_jmp)
+    vaut7 = opcode[0] & opcode[1] & opcode[2]
+    ok = opcode[3] | vaut7
+    return mux_tuple(ok, not_jmp, is_jmp)
 
 def mux_alu(opcode, not_alu, is_alu):
-    # Peut être facilement ameliore
     assert_same_type(not_alu, is_alu)
-    return mux_opcode(opcode, is_alu, not_alu, not_alu, not_alu)
+    return mux_tuple(opcode[0] | opcode[1] | opcode[2] | opcode[3], is_alu, not_alu)
 
 def mux_opcode(opcode, alu, shift, load_store, jmp):
     as_or_lj = opcode[0] | opcode[1]
