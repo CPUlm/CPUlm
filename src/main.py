@@ -11,15 +11,15 @@ allow_ribbon_logic_operations(True)
 def main():
     pc_old = Reg(Defer(WORD_SIZE, lambda: pc))
 
-    regs_old =   ( Reg(Defer(WORD_SIZE, lambda: r2)),
+    regs_old =  ( Reg(Defer(WORD_SIZE, lambda: r2)),
                   Reg(Defer(WORD_SIZE, lambda: r3)),
                   Reg(Defer(WORD_SIZE, lambda: r4)),
-                  Reg(Defer(WORD_SIZE, lambda: r5)) )
+                  Reg(Defer(WORD_SIZE, lambda: r5)))
 
     flags_old = ( Reg(Defer(1, lambda: flag_z)),
                   Reg(Defer(1, lambda: flag_n)),
                   Reg(Defer(1, lambda: flag_c)),
-                  Reg(Defer(1, lambda: flag_v)) )
+                  Reg(Defer(1, lambda: flag_v)))
  
 
     instruction = ROM(WORD_SIZE, WORD_SIZE, pc_old)

@@ -43,6 +43,29 @@ def test_flags(flags, flagsMask):
     f2 = Mux(flagsMask[2], Constant("0"), flags[2])
     f3 = Mux(flagsMask[3], Constant("0"), flags[3])
     return ( (f0 | f1) | (f2 | f3) )
+
+def mux5bits(t, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31):
+    t0 = t[0]
+    t1 = t[1]
+    t2 = t[2]
+    t3 = t[3]
+    t4 = t[4]
+    return mux_tuple(t0, mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v0, v1),
+                                                                   mux_tuple(t4, v2, v3)),
+                                                     mux_tuple(t3, mux_tuple(t4, v4, v5),
+                                                                   mux_tuple(t4, v6, v7))),
+                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v8, v9),
+                                                                   mux_tuple(t4, v10, v11)),
+                                                     mux_tuple(t3, mux_tuple(t4, v12, v13),
+                                                                   mux_tuple(t4, v14, v15)))),
+                         mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v16, v17),
+                                                                   mux_tuple(t4, v18, v19)),
+                                                     mux_tuple(t3, mux_tuple(t4, v20, v21),
+                                                                   mux_tuple(t4, v22, v23))),
+                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v24, v25),
+                                                                   mux_tuple(t4, v26, v27)),
+                                                     mux_tuple(t3, mux_tuple(t4, v28, v29),
+                                                                   mux_tuple(t4, v30, v31)))))
     
 def full_adder(a, b, c):
     tmp = a ^ b
