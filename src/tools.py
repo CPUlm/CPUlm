@@ -21,21 +21,18 @@ def mux_tuple(m, a, b):
         result.append(mux_tuple(m, u, v))
     return tuple(result)
 
+
 def get_reg(regId, regs):
-    # TODO adapter a plus de 4 regs
-    return Mux(regId[0],
-            Mux(regId[2], regs[0], regs[2]),
-            Mux(regId[2], regs[1], regs[3]))
+    return mux5bits(regId, Constant("0"*WORD_SIZE), Constant("0"*(WORD_SIZE-1)+"1"), regs[0], regs[1], regs[2], regs[3], regs[4], regs[5], regs[6], regs[7], regs[8], regs[9], regs[10], regs[11], regs[12], regs[13], regs[14], regs[15], regs[16], regs[17], regs[18], regs[19], regs[20], regs[21], regs[22], regs[23], regs[24], regs[25], regs[26], regs[27], regs[28], regs[29])
+
 
 def update_regs(regs_old, id_reg, regVal):
     # TODO adapter a plus de 4 reg
-    result2 = (regVal, regs_old[1], regs_old[2], regs_old[3])
-    result3 = (regs_old[0], regVal, regs_old[2], regs_old[3])
-    result4 = (regs_old[0], regs_old[1], regVal, regs_old[3])
-    result5 = (regs_old[0], regs_old[1], regs_old[2], regVal)
-    return mux_tuple(id_reg[0],
-            mux_tuple(id_reg[2], result2, result4),
-            mux_tuple(id_reg[2], result3, result5))
+    r0 = (regs_old[0], regs_old[1], regs_old[2], regs_old[3], regs_old[4], regs_old[5], regs_old[6], regs_old[7], regs_old[8], regs_old[9], regs_old[10], regs_old[11], regs_old[12], regs_old[13], regs_old[14], regs_old[15], regs_old[16], regs_old[17], regs_old[18], regs_old[19], regs_old[20], regs_old[21], regs_old[22], regs_old[23], regs_old[24], regs_old[25], regs_old[26], regs_old[27], regs_old[28], regs_old[29])
+
+    r2 = (regVal, regs_old[1], regs_old[2], regs_old[3], regs_old[4], regs_old[5], regs_old[6], regs_old[7], regs_old[8], regs_old[9], regs_old[10], regs_old[11], regs_old[12], regs_old[13], regs_old[14], regs_old[15], regs_old[16], regs_old[17], regs_old[18], regs_old[19], regs_old[20], regs_old[21], regs_old[22], regs_old[23], regs_old[24], regs_old[25], regs_old[26], regs_old[27], regs_old[28], regs_old[29])
+
+    return mux5bits(id_reg, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0)
 
 def test_flags(flags, flagsMask):
     f0 = Mux(flagsMask[0], Constant("0"), flags[0])

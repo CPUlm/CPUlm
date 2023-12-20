@@ -190,5 +190,5 @@ def shift(instruction, regs_old):
     
     # mux :
     regs_new = mux_tuple(instruction[0], asr_regs, mux_tuple(instruction[1], lsl_regs, lsr_regs))
-
+    
     return (regs_new,)

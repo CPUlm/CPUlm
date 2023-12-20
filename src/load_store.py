@@ -21,6 +21,7 @@ def load_store(instruction, regs_old):
 
     new_rd = Mux(ram_is_untouched, Mux(write_enable, rd_load, rd), rd_imm)
     regs_new = update_regs(regs_old, id_rd, new_rd)
+
     return (regs_new,)
 
 
