@@ -22,17 +22,20 @@ def mux_tuple(m, a, b):
     return tuple(result)
 
 
-def get_reg(regId, regs):
-    return mux5bits(regId, Constant("0"*WORD_SIZE), Constant("0"*(WORD_SIZE-1)+"1"), regs[0], regs[1], regs[2], regs[3], regs[4], regs[5], regs[6], regs[7], regs[8], regs[9], regs[10], regs[11], regs[12], regs[13], regs[14], regs[15], regs[16], regs[17], regs[18], regs[19], regs[20], regs[21], regs[22], regs[23], regs[24], regs[25], regs[26], regs[27], regs[28], regs[29])
+def get_reg(id_reg, regs):
+    #return mux5bits(id_reg, ( Constant("0"*WORD_SIZE), Constant("0"*(WORD_SIZE-1)+"1")) + regs, regs[0], regs[1], regs[2], regs[3], regs[4], regs[5], regs[6], regs[7], regs[8], regs[9], regs[10], regs[11], regs[12], regs[13], regs[14], regs[15], regs[16], regs[17], regs[18], regs[19], regs[20], regs[21], regs[22], regs[23], regs[24], regs[25], regs[26], regs[27], regs[28], regs[29])
+    return mux5bits(id_reg, ( Constant("0"*WORD_SIZE), Constant("0"*(WORD_SIZE-1)+"1")) + regs)
 
 
 def update_regs(regs_old, id_reg, regVal):
-    # TODO adapter a plus de 4 reg
-    r0 = (regs_old[0], regs_old[1], regs_old[2], regs_old[3], regs_old[4], regs_old[5], regs_old[6], regs_old[7], regs_old[8], regs_old[9], regs_old[10], regs_old[11], regs_old[12], regs_old[13], regs_old[14], regs_old[15], regs_old[16], regs_old[17], regs_old[18], regs_old[19], regs_old[20], regs_old[21], regs_old[22], regs_old[23], regs_old[24], regs_old[25], regs_old[26], regs_old[27], regs_old[28], regs_old[29])
+    arr = [regs_old, regs_old]
 
-    r2 = (regVal, regs_old[1], regs_old[2], regs_old[3], regs_old[4], regs_old[5], regs_old[6], regs_old[7], regs_old[8], regs_old[9], regs_old[10], regs_old[11], regs_old[12], regs_old[13], regs_old[14], regs_old[15], regs_old[16], regs_old[17], regs_old[18], regs_old[19], regs_old[20], regs_old[21], regs_old[22], regs_old[23], regs_old[24], regs_old[25], regs_old[26], regs_old[27], regs_old[28], regs_old[29])
+    for i in range(len(regs_old)):
+        deb = regs_old[0:i]
+        fin = regs_old[i+1:len(regs_old)]
+        arr.append( deb + (regVal,) + fin)
 
-    return mux5bits(id_reg, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0, r0)
+    return mux5bits(id_reg, arr)
 
 def test_flags(flags, flagsMask):
     f0 = Mux(flagsMask[0], Constant("0"), flags[0])
@@ -41,28 +44,28 @@ def test_flags(flags, flagsMask):
     f3 = Mux(flagsMask[3], Constant("0"), flags[3])
     return ( (f0 | f1) | (f2 | f3) )
 
-def mux5bits(t, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31):
+def mux5bits(t, v):
     t0 = t[0]
     t1 = t[1]
     t2 = t[2]
     t3 = t[3]
     t4 = t[4]
-    return mux_tuple(t0, mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v0, v1),
-                                                                   mux_tuple(t4, v2, v3)),
-                                                     mux_tuple(t3, mux_tuple(t4, v4, v5),
-                                                                   mux_tuple(t4, v6, v7))),
-                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v8, v9),
-                                                                   mux_tuple(t4, v10, v11)),
-                                                     mux_tuple(t3, mux_tuple(t4, v12, v13),
-                                                                   mux_tuple(t4, v14, v15)))),
-                         mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v16, v17),
-                                                                   mux_tuple(t4, v18, v19)),
-                                                     mux_tuple(t3, mux_tuple(t4, v20, v21),
-                                                                   mux_tuple(t4, v22, v23))),
-                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v24, v25),
-                                                                   mux_tuple(t4, v26, v27)),
-                                                     mux_tuple(t3, mux_tuple(t4, v28, v29),
-                                                                   mux_tuple(t4, v30, v31)))))
+    return mux_tuple(t0, mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[0], v[1]),
+                                                                   mux_tuple(t4, v[2], v[3])),
+                                                     mux_tuple(t3, mux_tuple(t4, v[4], v[5]),
+                                                                   mux_tuple(t4, v[6], v[7]))),
+                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[8], v[9]),
+                                                                   mux_tuple(t4, v[10], v[11])),
+                                                     mux_tuple(t3, mux_tuple(t4, v[12], v[13]),
+                                                                   mux_tuple(t4, v[14], v[15])))),
+                         mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[16], v[17]),
+                                                                   mux_tuple(t4, v[18], v[19])),
+                                                     mux_tuple(t3, mux_tuple(t4, v[20], v[21]),
+                                                                   mux_tuple(t4, v[22], v[23]))),
+                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[24], v[25]),
+                                                                   mux_tuple(t4, v[26], v[27])),
+                                                     mux_tuple(t3, mux_tuple(t4, v[28], v[29]),
+                                                                   mux_tuple(t4, v[30], v[31])))))
     
 def full_adder(a, b, c):
     tmp = a ^ b

@@ -80,7 +80,7 @@ def shift(instruction, regs_old):
     rs2 = get_reg(id_rs2, regs_old)[0:5]
 
     # Logical Shift Right:
-    lsl = mux5bits(rs2,
+    lsl = mux5bits(rs2,(
         rs1,
         rs1[1:32] + z1,
         rs1[2:32] + z2,
@@ -112,11 +112,11 @@ def shift(instruction, regs_old):
         rs1[28:32] + z28,
         rs1[29:32] + z29,
         rs1[30:32] + z30,
-        rs1[31:32] + z31)
+        rs1[31:32] + z31))
     lsl_regs = update_regs(regs_old, id_rd, lsl)
 
     # Logical Shift Right
-    lsr = mux5bits(rs2,
+    lsr = mux5bits(rs2,(
         rs1,
         z1 + rs1[0:31],
         z2 + rs1[0:30],
@@ -148,12 +148,12 @@ def shift(instruction, regs_old):
         z28 + rs1[0:4],
         z29 + rs1[0:3],
         z30 + rs1[0:2],
-        z31 + rs1[0:1])
+        z31 + rs1[0:1]))
     lsr_regs = update_regs(regs_old, id_rd, lsr)
 
 
     # Arithmetic Shift Right :
-    asr1 = mux5bits(rs2,            # dans le cas ou le bit de poids fort est 1
+    asr1 = mux5bits(rs2,(            # dans le cas ou le bit de poids fort est 1
         rs1,
         o1 + rs1[0:31],
         o2 + rs1[0:30],
@@ -185,7 +185,7 @@ def shift(instruction, regs_old):
         o28 + rs1[0:4],
         o29 + rs1[0:3],
         o30 + rs1[0:2],
-        o31 + rs1[0:1])
+        o31 + rs1[0:1]))
     asr_regs = update_regs(regs_old, id_rd, mux_tuple(rs1[WORD_SIZE-1],lsr,asr1))
     
     # mux :
