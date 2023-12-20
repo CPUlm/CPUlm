@@ -9,17 +9,17 @@ def load_store(instruction, regs_old):
     rd = get_reg(id_rd, regs_old)
     rs = get_reg(id_rs, regs_old)
 
-    doNotUseRam = instruction[0]
+    ram_is_untouched = instruction[0]
     
     cst16 = Constant("0"*(WORD_SIZE - IMM_BITS))
-    immDec = Mux(lhw, imm+cst16, cst16+imm)
-    rd_imm,_ = n_adder(immDec, rs)
+    imm_dec = Mux(lhw, imm+cst16, cst16+imm)
+    rd_imm,_ = n_adder(imm_dec, rs)
     
     
-    writeEnable = instruction[1]
-    rd_load = RAM(WORD_SIZE, WORD_SIZE, rs, writeEnable, rd, rs)
+    write_enable = instruction[1]
+    rd_load = RAM(WORD_SIZE, WORD_SIZE, rs, write_enable, rd, rs)
 
-    new_rd = Mux(doNotUseRam, Mux(writeEnable, rd_load, rd), rd_imm)
+    new_rd = Mux(ram_is_untouched, Mux(write_enable, rd_load, rd), rd_imm)
     regs_new = update_regs(regs_old, id_rd, new_rd)
     return (regs_new,)
 

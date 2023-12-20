@@ -113,7 +113,7 @@ def shift(instruction, regs_old):
         rs1[29:32] + z29,
         rs1[30:32] + z30,
         rs1[31:32] + z31)
-    lslRegs = update_regs(regs_old, id_rd, lsl)
+    lsl_regs = update_regs(regs_old, id_rd, lsl)
 
     # Logical Shift Right
     lsr = mux5bits(rs2,
@@ -149,7 +149,7 @@ def shift(instruction, regs_old):
         z29 + rs1[0:3],
         z30 + rs1[0:2],
         z31 + rs1[0:1])
-    lsrRegs = update_regs(regs_old, id_rd, lsr)
+    lsr_regs = update_regs(regs_old, id_rd, lsr)
 
 
     # Arithmetic Shift Right :
@@ -186,9 +186,9 @@ def shift(instruction, regs_old):
         o29 + rs1[0:3],
         o30 + rs1[0:2],
         o31 + rs1[0:1])
-    asrRegs = update_regs(regs_old, id_rd, mux_tuple(rs1[WORD_SIZE-1],lsr,asr1))
+    asr_regs = update_regs(regs_old, id_rd, mux_tuple(rs1[WORD_SIZE-1],lsr,asr1))
     
     # mux :
-    regs_new = mux_tuple(instruction[0], asrRegs, mux_tuple(instruction[1], lslRegs, lsrRegs))
+    regs_new = mux_tuple(instruction[0], asr_regs, mux_tuple(instruction[1], lsl_regs, lsr_regs))
 
     return (regs_new,)
