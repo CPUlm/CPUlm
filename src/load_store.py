@@ -1,6 +1,7 @@
 from constants import *
 from tools import *
 
+
 def load_store(instruction, regs_old):
     id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
     id_rs = instruction[OPCODE_BITS+REG_BITS : OPCODE_BITS+2*REG_BITS]
