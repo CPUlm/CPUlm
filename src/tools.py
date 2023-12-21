@@ -3,15 +3,14 @@ from constants import *
 ### assert ###
 
 def assert_same_type(a, b):
-    if isinstance(a, tuple) or isinstance(b, tuple):
+    if (isinstance(a, tuple) and isinstance(b, tuple)) or (isinstance(a,list) and isinstance(b,list)):
         assert (len(a) == len(b))
         for (u,v) in zip(a,b):
             assert_same_type(u,v)
-    
-    elif (not isinstance(a, tuple)) and (not isinstance(b, tuple)):
-        assert(a.bus_size == b.bus_size)
-    else:
+    elif isinstance(a,tuple) or isinstance(b,tuple) or isinstance(a,list) or isinstance(b,list):
         assert(False)
+    else:
+        assert(a.bus_size == b.bus_size)
 
 
 
