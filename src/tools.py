@@ -19,7 +19,7 @@ def assert_same_type(a, b):
 ### manipulation des registres ###
 
 def get_reg(id_reg, regs):
-    return mux5bits(id_reg, ( Constant("0"*WORD_SIZE), Constant("0"*(WORD_SIZE-1)+"1")) + regs)
+    return mux_n(id_reg, ( Constant("0"*WORD_SIZE), Constant("0"*(WORD_SIZE-1)+"1")) + regs)
 
 def update_regs(regs_old, id_reg, regVal):
     arr = [regs_old, regs_old]
@@ -29,7 +29,7 @@ def update_regs(regs_old, id_reg, regVal):
         fin = regs_old[i+1:len(regs_old)]
         arr.append( deb + (regVal,) + fin)
 
-    return mux5bits(id_reg, arr)
+    return mux_n(id_reg, arr)
 
 
 
@@ -60,29 +60,19 @@ def mux(m, a, b):
         result.append(mux(m, u, v))
     return tuple(result)
 
-def mux5bits(t, v):
-    t0 = t[0]
-    t1 = t[1]
-    t2 = t[2]
-    t3 = t[3]
-    t4 = t[4]
-    return mux(t0, mux(t1, mux(t2, mux(t3, mux(t4, v[0], v[1]),
-                                                                   mux(t4, v[2], v[3])),
-                                                     mux(t3, mux(t4, v[4], v[5]),
-                                                                   mux(t4, v[6], v[7]))),
-                                       mux(t2, mux(t3, mux(t4, v[8], v[9]),
-                                                                   mux(t4, v[10], v[11])),
-                                                     mux(t3, mux(t4, v[12], v[13]),
-                                                                   mux(t4, v[14], v[15])))),
-                         mux(t1, mux(t2, mux(t3, mux(t4, v[16], v[17]),
-                                                                   mux(t4, v[18], v[19])),
-                                                     mux(t3, mux(t4, v[20], v[21]),
-                                                                   mux(t4, v[22], v[23]))),
-                                       mux(t2, mux(t3, mux(t4, v[24], v[25]),
-                                                                   mux(t4, v[26], v[27])),
-                                                     mux(t3, mux(t4, v[28], v[29]),
-                                                                   mux(t4, v[30], v[31])))))
- 
+
+def mux_n(t,v):
+    n = len(v)
+    mil = n//2
+    assert(n == 2**t.bus_size)
+    if t.bus_size <= 1:
+        return v[0]
+    else:
+        cas1 = mux_n(t[1:t.bus_size], v[0:mil])
+        cas2 = mux_n(t[1:t.bus_size], v[mil:n])
+        res = mux(t[0], cas1, cas2)
+        return res
+
 def mux_jmp(opcode, not_jmp, is_jmp):
     assert_same_type(not_jmp, not_jmp)
     vaut7 = opcode[0] & opcode[1] & opcode[2]
