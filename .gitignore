@@ -939,3 +939,5 @@ TSWLatexianTemp*
 
 # glossaries
 *.glstex
+
+cpulm.netlist
