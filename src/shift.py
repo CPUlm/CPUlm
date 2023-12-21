@@ -186,9 +186,9 @@ def shift(instruction, regs_old):
         o29 + rs1[0:3],
         o30 + rs1[0:2],
         o31 + rs1[0:1]))
-    asr_regs = update_regs(regs_old, id_rd, mux_tuple(rs1[WORD_SIZE-1],lsr,asr1))
+    asr_regs = update_regs(regs_old, id_rd, mux(rs1[WORD_SIZE-1],lsr,asr1))
     
     # mux :
-    regs_new = mux_tuple(instruction[0], asr_regs, mux_tuple(instruction[1], lsl_regs, lsr_regs))
+    regs_new = mux(instruction[0], asr_regs, mux(instruction[1], lsl_regs, lsr_regs))
     
     return (regs_new,)

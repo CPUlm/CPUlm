@@ -19,10 +19,10 @@ def alu(instruction, regs_old):
     rd_mul = rd_add                 # TODO
     rd_div = rd_add                 # TODO
 
-    rd = mux_tuple(alucode[2], mux_tuple(alucode[1], mux_tuple(alucode[0], rd_and, rd_or),
-                                                     mux_tuple(alucode[0], rd_nor, rd_xor)),
-                               mux_tuple(alucode[1], mux_tuple(alucode[0], rd_add, rd_sub),
-                                                     mux_tuple(alucode[0], rd_mul, rd_div)))
+    rd = mux(alucode[2], mux(alucode[1], mux(alucode[0], rd_and, rd_or),
+                                                     mux(alucode[0], rd_nor, rd_xor)),
+                               mux(alucode[1], mux(alucode[0], rd_add, rd_sub),
+                                                     mux(alucode[0], rd_mul, rd_div)))
 
 
     regs_new = update_regs(regs_old, id_rd, rd_add)

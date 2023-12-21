@@ -49,15 +49,15 @@ def test_flags(flags, flagsMask):
 
 ### MUX specifiques ###    
 
-def mux_tuple(m, a, b):
-    # pareil que MUX(m,a,b), mais a et b peuvent etre des tuples
+def mux(m, a, b):
+    # pareil que MUX(m,a,b), mais a et b peuvent etre des tuples (donc remplace MUX)
     assert_same_type(a, b)
     if not isinstance(a, tuple):
         return Mux(m, a, b)
     
     result = []
     for (u,v) in zip(a,b):
-        result.append(mux_tuple(m, u, v))
+        result.append(mux(m, u, v))
     return tuple(result)
 
 def mux5bits(t, v):
@@ -66,41 +66,41 @@ def mux5bits(t, v):
     t2 = t[2]
     t3 = t[3]
     t4 = t[4]
-    return mux_tuple(t0, mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[0], v[1]),
-                                                                   mux_tuple(t4, v[2], v[3])),
-                                                     mux_tuple(t3, mux_tuple(t4, v[4], v[5]),
-                                                                   mux_tuple(t4, v[6], v[7]))),
-                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[8], v[9]),
-                                                                   mux_tuple(t4, v[10], v[11])),
-                                                     mux_tuple(t3, mux_tuple(t4, v[12], v[13]),
-                                                                   mux_tuple(t4, v[14], v[15])))),
-                         mux_tuple(t1, mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[16], v[17]),
-                                                                   mux_tuple(t4, v[18], v[19])),
-                                                     mux_tuple(t3, mux_tuple(t4, v[20], v[21]),
-                                                                   mux_tuple(t4, v[22], v[23]))),
-                                       mux_tuple(t2, mux_tuple(t3, mux_tuple(t4, v[24], v[25]),
-                                                                   mux_tuple(t4, v[26], v[27])),
-                                                     mux_tuple(t3, mux_tuple(t4, v[28], v[29]),
-                                                                   mux_tuple(t4, v[30], v[31])))))
+    return mux(t0, mux(t1, mux(t2, mux(t3, mux(t4, v[0], v[1]),
+                                                                   mux(t4, v[2], v[3])),
+                                                     mux(t3, mux(t4, v[4], v[5]),
+                                                                   mux(t4, v[6], v[7]))),
+                                       mux(t2, mux(t3, mux(t4, v[8], v[9]),
+                                                                   mux(t4, v[10], v[11])),
+                                                     mux(t3, mux(t4, v[12], v[13]),
+                                                                   mux(t4, v[14], v[15])))),
+                         mux(t1, mux(t2, mux(t3, mux(t4, v[16], v[17]),
+                                                                   mux(t4, v[18], v[19])),
+                                                     mux(t3, mux(t4, v[20], v[21]),
+                                                                   mux(t4, v[22], v[23]))),
+                                       mux(t2, mux(t3, mux(t4, v[24], v[25]),
+                                                                   mux(t4, v[26], v[27])),
+                                                     mux(t3, mux(t4, v[28], v[29]),
+                                                                   mux(t4, v[30], v[31])))))
  
 def mux_jmp(opcode, not_jmp, is_jmp):
     assert_same_type(not_jmp, not_jmp)
     vaut7 = opcode[0] & opcode[1] & opcode[2]
     ok = opcode[3] | vaut7
-    return mux_tuple(ok, not_jmp, is_jmp)
+    return mux(ok, not_jmp, is_jmp)
 
 def mux_alu(opcode, not_alu, is_alu):
     assert_same_type(not_alu, is_alu)
-    return mux_tuple(opcode[0] | opcode[1] | opcode[2] | opcode[3], is_alu, not_alu)
+    return mux(opcode[0] | opcode[1] | opcode[2] | opcode[3], is_alu, not_alu)
 
 def mux_opcode(opcode, alu, shift, load_store, jmp):
     as_or_lj = opcode[0] | opcode[1]
     s = opcode[2] | opcode[3]
     j = opcode[0] | (~opcode[1] & ~opcode[2] & ~opcode[3])
     
-    cas1 = mux_tuple(s, alu, shift)
-    cas2 = mux_tuple(j, load_store, jmp)
-    return mux_tuple(as_or_lj, cas1, cas2)
+    cas1 = mux(s, alu, shift)
+    cas2 = mux(j, load_store, jmp)
+    return mux(as_or_lj, cas1, cas2)
 
 
 ### addition et incrementation ###
