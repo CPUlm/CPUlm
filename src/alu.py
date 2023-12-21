@@ -43,7 +43,7 @@ def alu(instruction, regs_old):
     rd_xor = rs1 ^ rs2
     rd_add,_ = n_adder(rs1, rs2)
     rd_sub,_ = n_adder(rs1, rs2_neg)
-    rd_mul = mul(rs1, rs2)
+    rd_mul = mul(rs1, rs2) if WITH_MUL else rs1
     rd_div = rd_add                 # TODO
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
