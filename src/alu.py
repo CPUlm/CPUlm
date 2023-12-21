@@ -46,10 +46,7 @@ def alu(instruction, regs_old):
     rd_mul = mul(rs1, rs2)
     rd_div = rd_add                 # TODO
 
-    rd = mux(alucode[2], mux(alucode[1], mux(alucode[0], rd_and, rd_or),
-                                                     mux(alucode[0], rd_nor, rd_xor)),
-                               mux(alucode[1], mux(alucode[0], rd_add, rd_sub),
-                                                     mux(alucode[0], rd_mul, rd_div)))
+    rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
 
 
     regs_new = update_regs(regs_old, id_rd, rd_add)
