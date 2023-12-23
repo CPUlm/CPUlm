@@ -20,12 +20,14 @@ def mul(a, b):
     zn = Constant("0"*n)
 
     result = zn
+    c = Constant("0")
     for i in range(n):
         ajout = mux(a[i], zn, b)
-        result,_ = n_adder(result, ajout)
+        result,c_i = n_adder(result, ajout)
         b = b[1:n] + Constant("0")
+        c = c | c_i
         
-    return result
+    return (result,c)
 
 def or_n_bits(a):
     r = a[0]
@@ -78,12 +80,13 @@ def alu(instruction, regs_old):
     rd_or = rs1 | rs2
     rd_nor = ~rd_or
     rd_xor = rs1 ^ rs2
-    rd_add,_ = n_adder(rs1, rs2)
-    rd_sub,_ = n_adder(rs1, rs2_neg)
-    rd_mul = mul(rs1, rs2) if WITH_MUL else rs1
+    rd_add,c_add = n_adder(rs1, rs2)
+    rd_sub,c_sub = n_adder(rs1, rs2_neg)
+    rd_mul,c_mul = mul(rs1, rs2) if WITH_MUL else rs1
     rd_div = div(rs1, rs2) if WITH_DIV else rs1
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
+
 
 
     regs_new = update_regs(regs_old, id_rd, rd_add)
@@ -91,6 +94,9 @@ def alu(instruction, regs_old):
     
 
     # TODO : gestion des flags
-    new_flags = (Constant("0"), Constant("0"), Constant("0"), Constant("0") )
+    flag_z = ~or_n_bits(rd)
+    flag_n = rd[rd.bus_size-1]
+    flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, c_sub, c_mul, Constant("0")))
+    new_flags = (flag_z, flag_n, flag_c, Constant("0") )
 
     return (regs_old, new_flags)
