@@ -10,3 +10,4 @@ IMM24_BITS = 24
 FLAGS_BITS = 4
 
 WITH_MUL = True
+WITH_DIV = True

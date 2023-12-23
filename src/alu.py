@@ -27,6 +27,43 @@ def mul(a, b):
         
     return result
 
+def or_n_bits(a):
+    r = a[0]
+    for i in range(1, a.bus_size):
+        r = r | a[i]
+    return r
+
+def div(dividende, diviseur):
+    # TODO reflechir a la division signee
+    assert(dividende.bus_size == diviseur.bus_size)
+    n = dividende.bus_size
+
+    dividende_rogne = dividende[n-1]
+    trop_court = or_n_bits(diviseur[1:n])   # les seuls nombre restants possible sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
+    plus_grand = (~trop_court) & dividende_rogne
+    quotient = plus_grand
+    dividende_rogne = mux(plus_grand, dividende_rogne, Constant("0"))
+
+    for i in range(1,n):
+        assert (dividende_rogne.bus_size == i)
+        
+        dividende_rogne = dividende_rogne + dividende[n-i-1]
+        trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")
+        diff,_ = n_adder(dividende_rogne, incr(~diviseur[0:i+1]))
+
+        plus_grand = (~trop_court) & diff[diff.bus_size-1]
+
+        quotient = quotient + plus_grand
+        dividende_rogne = mux(plus_grand, dividende_rogne, diff)
+    return quotient
+
+
+        
+        
+
+        
+    return dividende_rogne
+
 def alu(instruction, regs_old):
     id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
     id_rs1 = instruction[OPCODE_BITS+REG_BITS : OPCODE_BITS+2*REG_BITS]
@@ -44,7 +81,7 @@ def alu(instruction, regs_old):
     rd_add,_ = n_adder(rs1, rs2)
     rd_sub,_ = n_adder(rs1, rs2_neg)
     rd_mul = mul(rs1, rs2) if WITH_MUL else rs1
-    rd_div = rd_add                 # TODO
+    rd_div = div(rs1, rs2) if WITH_DIV else rs1
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
 
