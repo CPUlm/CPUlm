@@ -51,7 +51,8 @@ def div(dividende, diviseur):
         
         dividende_rogne = dividende_rogne + dividende[n-i-1]
         trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")
-        diff,_ = n_adder(dividende_rogne, incr(~diviseur[0:i+1]))
+        neg_div,_ = incr(~diviseur[0:i+1])
+        diff,_ = n_adder(dividende_rogne, neg_div)
 
         plus_grand = (~trop_court) & diff[diff.bus_size-1]
 
@@ -74,7 +75,7 @@ def alu(instruction, regs_old):
     
     rs1 = get_reg(id_rs1, regs_old)
     rs2 = get_reg(id_rs2, regs_old)
-    rs2_neg = incr(~rs2)
+    rs2_neg,rs2_neg_carry = incr(~rs2)
 
     rd_and = rs1 & rs2
     rd_or = rs1 | rs2
@@ -87,16 +88,28 @@ def alu(instruction, regs_old):
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
 
-
-
     regs_new = update_regs(regs_old, id_rd, rd_add)
-    
-    
 
-    # TODO : gestion des flags
+
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
     flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, c_sub, c_mul, Constant("0")))
-    new_flags = (flag_z, flag_n, flag_c, Constant("0") )
+    signe_rs1 = rs1[rs1.bus_size - 1]
+    signe_rs2 = rs2[rs2.bus_size - 1]
+    signe_rs2_neg = rs2_neg[rs2.bus_size - 1]
+    signe_rd = rd[rd.bus_size - 1]
+
+    flag_z = mux_n(alucode[0:3], (Constant("0"),
+                                  Constant("0"),
+                                  Constant("0"),
+                                  Constant("0"),
+                                  (signe_rs1^signe_rs2) | ((~signe_rs1)^signe_rd),
+                                  rs2_neg_carry | (signe_rs1 ^ signe_rs2_neg) | ((~signe_rs1)^signe_rd),
+                                  Constant("1"), # TODO
+                                  Constant("0")))
+
+    
+    # TDOD flag_c et flag_z sont tres probablement faux
+    new_flags = (flag_z, flag_n, flag_c, flag_z )
 
     return (regs_old, new_flags)

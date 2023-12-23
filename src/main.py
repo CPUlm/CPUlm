@@ -61,7 +61,7 @@ def main():
 
     # selection du resultat grace a l'opcode et les resultats recus
 
-    pc_if_incr = incr(pc_old)
+    pc_if_incr,_ = incr(pc_old)
     pc = mux_jmp(opcode, pc_if_incr, jmp_set[1])
 
     flags = mux_alu(opcode, flags_old, alu_set[1])
