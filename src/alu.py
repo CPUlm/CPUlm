@@ -1,6 +1,7 @@
 from constants import *
 from tools import *
 
+
 def big_adder(lst):
     # retourne la somme de tous les elements de lst
     n = len(lst)
@@ -13,6 +14,7 @@ def big_adder(lst):
         s2 = big_adder(lst[m:n])
         s,c = n_adder(s1, s2)
         return s
+
 
 def mul(a, b):
     assert(a.bus_size == b.bus_size)
@@ -29,21 +31,23 @@ def mul(a, b):
         
     return (result,c)
 
+
 def or_n_bits(a):
     r = a[0]
     for i in range(1, a.bus_size):
         r = r | a[i]
     return r
 
+
 def div(dividende, diviseur):
-    # il s'agit de l'algorithme de division stadart (celui qu'on pose à la main)
+    # il s'agit de l'algorithme de division standard (celui qu'on pose à la main)
     # on considère donc de plus en plus de bits du quotient, et on soustrait le diviseur quand c'est possible
     assert(dividende.bus_size == diviseur.bus_size)
     n = dividende.bus_size
 
-    # comme il est impossibles d'initialiser les variables à Constant(""), ces quelques lignes simulent la première itération de la boucle
+    # comme il est impossible d'initialiser les variables à Constant(""), ces quelques lignes simulent la première itération de la boucle
     dividende_rogne = dividende[n-1]
-    trop_court = or_n_bits(diviseur[1:n])   # les seuls nombre restants possible sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
+    trop_court = or_n_bits(diviseur[1:n])   # les seuls nombre restants possibles sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
     plus_grand = (~trop_court) & dividende_rogne
     quotient = plus_grand
     dividende_rogne = mux(plus_grand, dividende_rogne, Constant("0"))
@@ -51,9 +55,8 @@ def div(dividende, diviseur):
     for i in range(1,n):
         assert (dividende_rogne.bus_size == i)
         assert (quotient.bus_size == i)
-        #  on va faire l'étape où le dividende à i+1 bits
+        #  on va faire l'étape où le dividende a i+1 bits
         #  on a donc déjà calculé les i premiers bits du quotient
-
 
         dividende_rogne = dividende_rogne + dividende[n-i-1]                    # le nouveau dividende
         trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
@@ -89,7 +92,6 @@ def alu(instruction, regs_old):
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
 
     regs_new = update_regs(regs_old, id_rd, rd_add)
-
 
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
