@@ -118,3 +118,6 @@ def n_adder(a, b):
         s = s + s_i
     return (s, c)
 
+def negation(a):
+    return incr(~a)
+

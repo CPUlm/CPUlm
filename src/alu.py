@@ -36,10 +36,12 @@ def or_n_bits(a):
     return r
 
 def div(dividende, diviseur):
-    # TODO reflechir a la division signee
+    # il s'agit de l'algorithme de division stadart (celui qu'on pose à la main)
+    # on considère donc de plus en plus de bits du quotient, et on soustrait le diviseur quand c'est possible
     assert(dividende.bus_size == diviseur.bus_size)
     n = dividende.bus_size
 
+    # comme il est impossibles d'initialiser les variables à Constant(""), ces quelques lignes simulent la première itération de la boucle
     dividende_rogne = dividende[n-1]
     trop_court = or_n_bits(diviseur[1:n])   # les seuls nombre restants possible sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
     plus_grand = (~trop_court) & dividende_rogne
@@ -48,24 +50,22 @@ def div(dividende, diviseur):
 
     for i in range(1,n):
         assert (dividende_rogne.bus_size == i)
-        
-        dividende_rogne = dividende_rogne + dividende[n-i-1]
-        trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")
-        neg_div,_ = incr(~diviseur[0:i+1])
-        diff,_ = n_adder(dividende_rogne, neg_div)
+        assert (quotient.bus_size == i)
+        #  on va faire l'étape où le dividende à i+1 bits
+        #  on a donc déjà calculé les i premiers bits du quotient
 
-        plus_grand = (~trop_court) & diff[diff.bus_size-1]
+
+        dividende_rogne = dividende_rogne + dividende[n-i-1]                    # le nouveau dividende
+        trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
+        neg_div,_ = negation(diviseur[0:i+1])                                   
+        diff,_ = n_adder(dividende_rogne, neg_div)                              # resultat si on fait la soustraction
+
+        plus_grand = (~trop_court) & diff[diff.bus_size-1]   # indique si il y a assez de bits et que le resultat de la soustraction est positif
 
         quotient = quotient + plus_grand
         dividende_rogne = mux(plus_grand, dividende_rogne, diff)
     return quotient
 
-
-        
-        
-
-        
-    return dividende_rogne
 
 def alu(instruction, regs_old):
     id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
@@ -75,7 +75,7 @@ def alu(instruction, regs_old):
     
     rs1 = get_reg(id_rs1, regs_old)
     rs2 = get_reg(id_rs2, regs_old)
-    rs2_neg,rs2_neg_carry = incr(~rs2)
+    rs2_neg,rs2_neg_carry = negation(rs2)
 
     rd_and = rs1 & rs2
     rd_or = rs1 | rs2
@@ -99,17 +99,16 @@ def alu(instruction, regs_old):
     signe_rs2_neg = rs2_neg[rs2.bus_size - 1]
     signe_rd = rd[rd.bus_size - 1]
 
-    flag_z = mux_n(alucode[0:3], (Constant("0"),
+    flag_v = mux_n(alucode[0:3], (Constant("0"),
                                   Constant("0"),
                                   Constant("0"),
                                   Constant("0"),
-                                  (signe_rs1^signe_rs2) | ((~signe_rs1)^signe_rd),
-                                  rs2_neg_carry | (signe_rs1 ^ signe_rs2_neg) | ((~signe_rs1)^signe_rd),
-                                  Constant("1"), # TODO
+                                  (signe_rs1^signe_rs2) | ((~signe_rs1)^signe_rd),  # addition : il y a overflow si les nombre que l'on additionne sont de même signe et que le résultat n'est pas du même signe
+                                  rs2_neg_carry | (signe_rs1 ^ signe_rs2_neg) | ((~signe_rs1)^signe_rd),  # soustratction : de même mais avec le nombre négatif associé 
+                                  Constant("0"),
                                   Constant("0")))
 
     
-    # TDOD flag_c et flag_z sont tres probablement faux
-    new_flags = (flag_z, flag_n, flag_c, flag_z )
+    new_flags = (flag_z, flag_n, flag_c, flag_v )
 
     return (regs_old, new_flags)
