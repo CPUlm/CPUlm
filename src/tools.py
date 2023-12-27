@@ -103,7 +103,7 @@ def incr(a):
         c = a[i] & c
         s = s + s_i
     assert_same_type(a, s)
-    return s
+    return (s,c)
 
 def full_adder(a, b, c):
     tmp = a ^ b
@@ -117,4 +117,7 @@ def n_adder(a, b):
         (s_i, c) = full_adder(a[i], b[i], c)
         s = s + s_i
     return (s, c)
+
+def negation(a):
+    return incr(~a)
 

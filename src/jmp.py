@@ -11,7 +11,7 @@ def jmp(instruction, regs_old, flags, pc_old):
     has_imm = opcode[3] & (opcode[0] | opcode[1])
     flag_ok = test_flags(flags, Mux(has_imm, flags_mask1, flags_mask2))
     
-    incr_pc = incr(pc_old)
+    incr_pc,_ = incr(pc_old)
     dest_jmp = get_reg(rd_addr, regs_old)
     dest_jmpc = Mux(flag_ok, incr_pc, dest_jmp)
     
