@@ -1,0 +1,5 @@
+INPUT rs1, rs2
+OUTPUT rd_and
+VAR rs1:32, rs2:32, rd_and:32
+IN
+rd_and = AND rs1 rs2

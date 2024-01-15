@@ -48,9 +48,8 @@ def mux_n(t,v):
 ### addition et incrementation ###
 def incr(a):
     assert(a.bus_size >= 1)
-    c = Constant("1")
-    s = ~a[0]
     c = a[0]
+    s = ~a[0]
     for i in range(1, a.bus_size):
         s_i = a[i] ^ c
         c = a[i] & c
@@ -72,6 +71,9 @@ def n_adder(a, b):
     return (s, c)
 
 def negation(a):
+    a.set_as_output("a")
+    r=~a
+    r.set_as_output("r")
     return incr(~a)
 
 
@@ -163,7 +165,7 @@ def main():
                                   rs2_neg_carry | (signe_rs1 ^ signe_rs2_neg) | ((~signe_rs1)^signe_rd),  # soustratction : de même mais avec le nombre négatif associé 
                                   Constant("0"),
                                   Constant("0")))
-
+    rs2_neg.set_as_output("rs2_neg")
     
     rd.set_as_output("rd")
     flag_z.set_as_output("flag_z")

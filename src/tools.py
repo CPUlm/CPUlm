@@ -95,7 +95,6 @@ def mux_opcode(opcode, alu, shift, load_store, jmp):
 ### addition et incrementation ###
 def incr(a):
     assert(a.bus_size >= 1)
-    c = Constant("1")
     s = ~a[0]
     c = a[0]
     for i in range(1, a.bus_size):
