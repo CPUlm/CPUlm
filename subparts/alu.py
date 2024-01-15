@@ -130,9 +130,9 @@ def div(dividende, diviseur):
 
 
 def main():
-    rs1 = Constant("0"*32)
-    rs2 = Constant("0"*32)
-    alucode = Constant("0"*3)
+    rs1 = Input(32)
+    rs2 = Input(32)
+    alucode = Input(3)
     rs2_neg,rs2_neg_carry = negation(rs2)
 
     rd_and = rs1 & rs2
@@ -165,7 +165,8 @@ def main():
                                   Constant("0")))
 
     
-    new_flags = (flag_z, flag_n, flag_c, flag_v )
-
-
-
+    rd.set_as_output("rd")
+    flag_z.set_as_output("flag_z")
+    flag_n.set_as_output("flag_n")
+    flag_c.set_as_output("flag_c")
+    flag_v.set_as_output("flag_v")
