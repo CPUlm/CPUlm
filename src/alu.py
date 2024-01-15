@@ -77,7 +77,7 @@ def alu(instruction, regs_old):
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
 
-    regs_new = update_regs(regs_old, id_rd, rd_add)
+    regs_new = update_regs(regs_old, id_rd, rd)
 
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
