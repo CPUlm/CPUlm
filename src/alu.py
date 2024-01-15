@@ -2,20 +2,6 @@ from constants import *
 from tools import *
 
 
-def big_adder(lst):
-    # retourne la somme de tous les elements de lst
-    n = len(lst)
-    assert(n > 0)
-    if n == 1:
-        return lst[0]
-    else:
-        m = n//2
-        s1 = big_adder(lst[0:m])
-        s2 = big_adder(lst[m:n])
-        s,c = n_adder(s1, s2)
-        return s
-
-
 def mul(a, b):
     assert(a.bus_size == b.bus_size)
     n = a.bus_size
@@ -86,7 +72,7 @@ def alu(instruction, regs_old):
     rd_xor = rs1 ^ rs2
     rd_add,c_add = n_adder(rs1, rs2)
     rd_sub,c_sub = n_adder(rs1, rs2_neg)
-    rd_mul,c_mul = mul(rs1, rs2) if WITH_MUL else rs1
+    rd_mul,c_mul = mul(rs1, rs2) if WITH_MUL else rs1,Constant("0")
     rd_div = div(rs1, rs2) if WITH_DIV else rs1
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
@@ -113,4 +99,4 @@ def alu(instruction, regs_old):
     
     new_flags = (flag_z, flag_n, flag_c, flag_v )
 
-    return (regs_old, new_flags)
+    return (regs_new, new_flags)
