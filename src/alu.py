@@ -44,17 +44,17 @@ def div(dividende, diviseur):
         #  on va faire l'étape où le dividende a i+1 bits
         #  on a donc déjà calculé les i premiers bits du quotient
 
-        dividende_rogne = dividende_rogne + dividende[n-i-1]                    # le nouveau dividende
+        dividende_rogne = dividende[n-i-1] + dividende_rogne                   # le nouveau dividende
         trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
         neg_div,_ = negation(diviseur[0:i+1])                                   
-        diff,_ = n_adder(dividende_rogne, neg_div)                              # resultat si on fait la soustraction
+        diff,carry_neg = n_adder(dividende_rogne, neg_div)                              # resultat si on fait la soustraction
 
-        plus_grand = (~trop_court) & diff[diff.bus_size-1]   # indique si il y a assez de bits et que le resultat de la soustraction est positif
+        plus_grand = (~trop_court) & (carry_neg)   # indique si il y a assez de bits et que le resultat de la soustraction est positif
 
-        quotient = quotient + plus_grand
+        quotient = plus_grand + quotient 
         dividende_rogne = mux(plus_grand, dividende_rogne, diff)
+    assert(quotient.bus_size == dividende.bus_size)
     return quotient
-
 
 def alu(instruction, regs_old):
     id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
