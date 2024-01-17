@@ -1,8 +1,8 @@
 from lib_carotte import *
 allow_ribbon_logic_operations(True)
 
-WITH_MUL = False
-WITH_DIV = False
+WITH_MUL = True
+WITH_DIV = True
 
 
 ### assert ###
@@ -70,9 +70,7 @@ def n_adder(a, b):
     return (s, c)
 
 def negation(a):
-    a.set_as_output("a")
     r=~a
-    r.set_as_output("r")
     return incr(~a)
 
 
@@ -88,7 +86,8 @@ def mul(a, b):
         result,c_i = n_adder(result, ajout)
         b = b[1:n] + Constant("0")
         c = c | c_i
-        
+
+    assert(result.bus_size == a.bus_size)    
     return (result,c)
 
 
@@ -127,6 +126,7 @@ def div(dividende, diviseur):
 
         quotient = quotient + plus_grand
         dividende_rogne = mux(plus_grand, dividende_rogne, diff)
+    assert(quotient.bus_size == dividende.bus_size)
     return quotient
 
 
@@ -142,7 +142,7 @@ def main():
     rd_xor = rs1 ^ rs2
     rd_add,c_add = n_adder(rs1, rs2)
     rd_sub,c_sub = n_adder(rs1, rs2_neg)
-    rd_mul,c_mul = mul(rs1, rs2) if WITH_MUL else rs1,Constant("0")
+    rd_mul,c_mul = mul(rs1, rs2) if WITH_MUL else (rs1,Constant("0"))
     rd_div = div(rs1, rs2) if WITH_DIV else rs1
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
@@ -164,8 +164,6 @@ def main():
                                   rs2_neg_carry | (signe_rs1 ^ signe_rs2_neg) | ((~signe_rs1)^signe_rd),  # soustratction : de même mais avec le nombre négatif associé 
                                   Constant("0"),
                                   Constant("0")))
-    rs2_neg.set_as_output("rs2_neg")
-    rd_sub.set_as_output("rd_sub")
     
     rd.set_as_output("rd")
     flag_z.set_as_output("flag_z")
