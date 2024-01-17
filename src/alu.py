@@ -12,7 +12,7 @@ def mul(a, b):
     for i in range(n):
         ajout = mux(a[i], zn, b)
         result,c_i = n_adder(result, ajout)
-        b = b[1:n] + Constant("0")
+        b = Constant("0") + b[0:n-1]
         c = c | c_i
         
     return (result,c)
