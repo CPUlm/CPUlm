@@ -59,17 +59,16 @@ def mux(m, a, b):
         result.append(mux(m, u, v))
     return tuple(result)
 
-
 def mux_n(t,v):
     n = len(v)
     mil = n//2
     assert(n == 2**t.bus_size)
-    if t.bus_size <= 1:
-        return v[0]
+    if t.bus_size == 1:
+        return mux(t,v[0],v[1])
     else:
-        cas1 = mux_n(t[1:t.bus_size], v[0:mil])
-        cas2 = mux_n(t[1:t.bus_size], v[mil:n])
-        res = mux(t[0], cas1, cas2)
+        cas1 = mux_n(t[0:t.bus_size-1], v[0:mil])
+        cas2 = mux_n(t[0:t.bus_size-1], v[mil:n])
+        res = mux(t[t.bus_size-1], cas1, cas2)
         return res
 
 def mux_jmp(opcode, not_jmp, is_jmp):
