@@ -82,17 +82,13 @@ def alu(instruction, regs_old):
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
     flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, c_sub, c_mul, Constant("0")))
-    signe_rs1 = rs1[rs1.bus_size - 1]
-    signe_rs2 = rs2[rs2.bus_size - 1]
-    signe_rs2_neg = rs2_neg[rs2.bus_size - 1]
-    signe_rd = rd[rd.bus_size - 1]
 
     flag_v = mux_n(alucode[0:3], (Constant("0"),
                                   Constant("0"),
                                   Constant("0"),
                                   Constant("0"),
-                                  (signe_rs1^signe_rs2) | ((~signe_rs1)^signe_rd),  # addition : il y a overflow si les nombre que l'on additionne sont de même signe et que le résultat n'est pas du même signe
-                                  rs2_neg_carry | (signe_rs1 ^ signe_rs2_neg) | ((~signe_rs1)^signe_rd),  # soustratction : de même mais avec le nombre négatif associé 
+            (~rs1[rs1.bus_size-1] & ~rs2[rs2.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2[rs2.bus_size-1] & ~rd[rd.bus_size-1]),
+            (~rs1[rs1.bus_size-1] & ~rs2_neg[rs2_neg.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2_neg[rs2_neg.bus_size-1] & ~rd[rd.bus_size-1]),
                                   Constant("0"),
                                   Constant("0")))
 
