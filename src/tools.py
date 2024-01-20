@@ -82,14 +82,13 @@ def mux_alu(opcode, not_alu, is_alu):
     return mux(opcode[0] | opcode[1] | opcode[2] | opcode[3], is_alu, not_alu)
 
 def mux_opcode(opcode, alu, shift, load_store, jmp):
-    as_or_lj = opcode[0] | opcode[1]
-    s = opcode[2] | opcode[3]
-    j = opcode[0] | (~opcode[1] & ~opcode[2] & ~opcode[3])
+    as_or_lj = opcode[2] | opcode[3]
+    s = opcode[0] | opcode[1]
+    j = opcode[3] | (~opcode[0] & ~opcode[1] & ~opcode[2])
     
     cas1 = mux(s, alu, shift)
     cas2 = mux(j, load_store, jmp)
     return mux(as_or_lj, cas1, cas2)
-
 
 ### addition et incrementation ###
 def incr(a):
