@@ -102,3 +102,13 @@ def main():
     r30 = regs[28]
     r31 = regs[29]
 
+    pc.set_as_output("pc")
+    r2.set_as_output("r2")
+    r3.set_as_output("r3")
+    r4.set_as_output("r4")
+    r5.set_as_output("r5")
+    r6.set_as_output("r6")
+    r28.set_as_output("rout")
+    r31.set_as_output("rpriv")
+
+
