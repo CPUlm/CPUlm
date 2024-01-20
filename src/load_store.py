@@ -13,7 +13,7 @@ def load_store(instruction, regs_old):
     ram_is_untouched = instruction[0]
     
     cst16 = Constant("0"*(WORD_SIZE - IMM_BITS))
-    imm_dec = mux(lhw, imm+cst16, cst16+imm)
+    imm_dec = mux(lhw, cst16+imm, imm+cst16)
     rd_imm,_ = n_adder(imm_dec, rs)
     
     
