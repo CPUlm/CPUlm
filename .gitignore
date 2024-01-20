@@ -941,3 +941,5 @@ TSWLatexianTemp*
 *.glstex
 
 cpulm.netlist
+cpulm.net
+subparts

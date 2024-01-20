@@ -59,17 +59,16 @@ def mux(m, a, b):
         result.append(mux(m, u, v))
     return tuple(result)
 
-
 def mux_n(t,v):
     n = len(v)
     mil = n//2
     assert(n == 2**t.bus_size)
-    if t.bus_size <= 1:
-        return v[0]
+    if t.bus_size == 1:
+        return mux(t,v[0],v[1])
     else:
-        cas1 = mux_n(t[1:t.bus_size], v[0:mil])
-        cas2 = mux_n(t[1:t.bus_size], v[mil:n])
-        res = mux(t[0], cas1, cas2)
+        cas1 = mux_n(t[0:t.bus_size-1], v[0:mil])
+        cas2 = mux_n(t[0:t.bus_size-1], v[mil:n])
+        res = mux(t[t.bus_size-1], cas1, cas2)
         return res
 
 def mux_jmp(opcode, not_jmp, is_jmp):
@@ -83,19 +82,17 @@ def mux_alu(opcode, not_alu, is_alu):
     return mux(opcode[0] | opcode[1] | opcode[2] | opcode[3], is_alu, not_alu)
 
 def mux_opcode(opcode, alu, shift, load_store, jmp):
-    as_or_lj = opcode[0] | opcode[1]
-    s = opcode[2] | opcode[3]
-    j = opcode[0] | (~opcode[1] & ~opcode[2] & ~opcode[3])
+    as_or_lj = opcode[2] | opcode[3]
+    s = opcode[0] | opcode[1]
+    j = opcode[3] | (~opcode[0] & ~opcode[1] & ~opcode[2])
     
     cas1 = mux(s, alu, shift)
     cas2 = mux(j, load_store, jmp)
     return mux(as_or_lj, cas1, cas2)
 
-
 ### addition et incrementation ###
 def incr(a):
     assert(a.bus_size >= 1)
-    c = Constant("1")
     s = ~a[0]
     c = a[0]
     for i in range(1, a.bus_size):
