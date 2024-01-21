@@ -2,7 +2,7 @@ from constants import *
 from tools import *
 
 
-def mul(a, b):
+def mul_old(a, b):
     assert(a.bus_size == b.bus_size)
     n = a.bus_size
     zn = Constant("0"*n)
@@ -16,6 +16,22 @@ def mul(a, b):
         c = c | c_i
         
     return (result,c)
+
+def mul(a, b):
+    assert(a.bus_size == b.bus_size)
+    n = a.bus_size
+
+    result = b[0] & a[n-1]
+    c = Constant("0")
+    for i in range(1,n):
+        assert(result.bus_size == i)
+        result = Constant("0") + result
+        result_si_ajout,c_i = n_adder(result, b[0:i+1])
+        result = mux(a[n-i-1], result, result_si_ajout)
+        c = mux(a[n-i-1],c, c|c_i)
+    return (result,c)
+
+
 
 
 def or_n_bits(a):
@@ -59,32 +75,28 @@ def div(dividende, diviseur):
 def alu(instruction, rs1, rs2):
     alucode = instruction[OPCODE_BITS + 3*REG_BITS : OPCODE_BITS + 3*REG_BITS + ALU_BITS]
     
-    rs2_neg,rs2_neg_carry = negation(rs2)
+    add_or_sub = alucode[0]
+    rs2_to_add = mux(add_or_sub,rs2,~rs2)
 
     rd_and = rs1 & rs2
     rd_or = rs1 | rs2
     rd_nor = ~rd_or
     rd_xor = rs1 ^ rs2
-    rd_add,c_add = n_adder(rs1, rs2)
-    rd_sub,c_sub = n_adder(rs1, rs2_neg)
+    rd_add,c_add = n_adder_carry(rs1, rs2_to_add, add_or_sub)
     rd_mul,c_mul = mul(rs1, rs2)
     rd_div = div(rs1, rs2)
 
-    rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
+    rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_add, rd_mul, rd_div))
 
 
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
-    flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, ~c_sub, c_mul, Constant("0")))
+    flag_c = mux(alucode[2], Constant("0"), mux_n(alucode[0:2], (c_add, ~c_add, c_mul, Constant("0"))))
 
-    flag_v = mux_n(alucode[0:3], (Constant("0"),
-                                  Constant("0"),
-                                  Constant("0"),
-                                  Constant("0"),
-            (~rs1[rs1.bus_size-1] & ~rs2[rs2.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2[rs2.bus_size-1] & ~rd[rd.bus_size-1]),
-            (~rs1[rs1.bus_size-1] & ~rs2_neg[rs2_neg.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2_neg[rs2_neg.bus_size-1] & ~rd[rd.bus_size-1]),
-                                  Constant("0"),
-                                  Constant("0")))
+    assert(rs1.bus_size == rs2.bus_size == rd.bus_size == rs2_to_add.bus_size)
+    size = rs2.bus_size
+    carry_v_add = (~rs1[size-1] & ~rs2_to_add[size-1] & rd[size-1]) | (rs1[size-1] & rs2_to_add[size-1] & ~rd[size-1])
+    flag_v = mux(alucode[2], Constant("0"), mux(alucode[1], carry_v_add, Constant("0")))
 
     
     new_flags = (flag_z, flag_n, flag_c, flag_v )

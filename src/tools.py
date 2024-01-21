@@ -110,14 +110,16 @@ def full_adder(a, b, c):
     tmp = a ^ b
     return (tmp ^ c, (tmp & c) | (a & b))
 
-def n_adder(a, b):
+def n_adder_carry(a, b, c):
     assert(a.bus_size == b.bus_size)
-    c = Constant("0")
     (s, c) = full_adder(a[0], b[0], c) # Treat the 0 case separately since variables have a bus size >= 1
     for i in range(1, a.bus_size):
         (s_i, c) = full_adder(a[i], b[i], c)
         s = s + s_i
     return (s, c)
+
+def n_adder(a,b):
+    return n_adder_carry(a,b,Constant("0"))
 
 def negation(a):
     return incr(~a)

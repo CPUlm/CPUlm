@@ -1,6 +1,6 @@
 #!/bin/bash
 
-make all
+make
 make build file=../CPUlm/cpulm.net -C ../SimulateurC
 
 
@@ -11,6 +11,7 @@ for ulmFile in test/*.ulm; do
 	echo $ulmFile
 	echo -en "${red}"
 	./../Assembler/asm $ulmFile
+	echo -en "${red}"
     diff -w -B <(./../SimulateurC/build/a.out -p ${ulmFile/.ulm/.po} -d ${ulmFile/.ulm/.do}) ${ulmFile/.ulm/.out} 
 	echo -en "${noColor}"
 done
