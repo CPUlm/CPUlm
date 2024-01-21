@@ -84,7 +84,7 @@ def mux_alu(opcode, not_alu, is_alu):
 def mux_opcode(opcode, alu, shift, load_store, jmp):
     as_or_lj = opcode[2] | opcode[3]
     s = opcode[0] | opcode[1]
-    j = opcode[3] | (~opcode[0] & ~opcode[1] & ~opcode[2])
+    j = opcode[3] | (opcode[0] & opcode[1] & opcode[2])
     
     cas1 = mux(s, alu, shift)
     cas2 = mux(j, load_store, jmp)

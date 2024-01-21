@@ -1,0 +1,19 @@
+.text
+; Ce programme incrémente r3 jusqu'à ce que r3 = max
+
+main:
+    loadi   r2  $max
+    load    r2  r2
+    loadi   r3  0
+
+loop:
+    sub     r4  r2  r3
+    jmp.z   $end
+    inc     r3  r3
+    jmp     $loop
+
+end:
+    halt
+
+.data
+max: .int 5
