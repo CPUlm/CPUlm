@@ -63,14 +63,14 @@ def main():
     rs1 = get_reg(id_rs1, regs_old)
     rs2 = get_reg(id_rs2, regs_old)
     rd = get_reg(id_rd, regs_old)
-
+    pc_if_incr,carry = incr(pc_old)
 
     # chacune renvoie un n-uplet contenant les nouvelles valeur
 
     alu_set = alu(instruction, rs1, rs2)                     # renvoie (rd, flags)
     shift_set = shift(instruction, rs1, rs2)                 # renvoie (rd,)
     load_store_set = load_store(instruction, rd, rs1)        # renvoie (regs,)
-    jmp_set = jmp(instruction, rd, flags_old, pc_old)  # renvoie (pc,)
+    jmp_set = jmp(instruction, rd, flags_old, pc_old, pc_if_incr)  # renvoie (pc,)
 
     # calcul deplaces :
     rd_if_change = mux_alu_shift_load(opcode, alu_set[0], shift_set[0], load_store_set[0])
@@ -78,7 +78,6 @@ def main():
 
     # selection du resultat grace a l'opcode et les resultats recus
 
-    pc_if_incr,carry = incr(pc_old)
     pc = mux_jmp(opcode, pc_if_incr, jmp_set[0])
 
     flags = mux_alu(opcode, flags_old, alu_set[1])
