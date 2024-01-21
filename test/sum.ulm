@@ -1,0 +1,50 @@
+.text
+
+; Compute the sum of an array
+
+; void fillarray(int* array, int array_length)
+fillarray:
+    ; array is stored in r20
+    ; array_length is stored in r21
+    test r21
+    jmp.z $fillarray_end
+    store r20 r21
+    inc r20 r20
+    dec r21 r21
+    jmp $fillarray
+fillarray_end:
+    ret
+
+; int sum(int* array, int array_length)
+sum:
+    loadi rout 0
+sum_start:
+    ; array is stored in r20
+    ; array_length is stored in r21
+    test r21
+    jmp.z $sum_end
+    load r2 r20
+    add rout rout r2
+    inc r20 r20
+    dec r21 r21
+    jmp $sum_start
+sum_end:
+    ret
+
+main:
+    mov r20 r0
+    loadi r21 10
+    call $fillarray
+    mov r20 r0
+    loadi r21 10
+    call $sum
+    loadi r2 55
+    sub r2 rout r2
+    jmp.z $success
+    mov rout r0
+    jmp $end
+success:
+    mov rout r1
+    jmp $end
+end:
+    halt

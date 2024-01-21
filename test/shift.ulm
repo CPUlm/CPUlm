@@ -1,0 +1,26 @@
+.text
+
+main:
+    loadi r2 5
+    loadi r3 6
+    lsl r4 r3 r2 ; r4 should contain 0b1100000
+    loadi r5 384
+    lsr r6 r5 r1 ; r6 should contain 0b1100000
+    sub r6 r4 r6
+    jmp.z $success_a
+    loadi rout 0
+    jmp $end
+success_a:
+    loadi r3 47
+    sub r4 r1 r3
+    asr r5 r4 r1
+    loadi r6 0xffffffe9
+    sub r7 r6 r5
+    jmp.z $success_b
+    loadi rout 0
+    jmp $end
+success_b:
+    loadi rout 1
+
+end:
+    halt

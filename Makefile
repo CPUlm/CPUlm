@@ -6,6 +6,6 @@ all: src/main.py
 clean:
 	-rm src/__pycache__ -r
 	-rm carotte/__pycache__ -r
-	-rm cpulm.netlist
+	-rm cpulm.net
 
 .PHONY: all clean

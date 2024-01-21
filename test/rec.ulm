@@ -1,0 +1,30 @@
+.text
+
+; Compute foo(8)
+
+; int foo(int n) {
+;     if (n == 0) {
+;         return 42;
+;     } else {
+;         return foo(n-1)+1
+;     }
+; }
+foo: ; le parametre est dans r2
+    test r2
+    jmp.z $foo_0
+    dec r2 r2
+    call $foo
+    add rout rout r1
+    ret
+foo_0:
+    loadi rout 42
+    ret
+
+main:
+    loadi r2 4
+    call $foo
+    loadi r2 46
+    sub rout rout r2
+    neg rout rout       ; juste pour le test
+    inc rout rout      ; on veut rout = 1
+    halt
