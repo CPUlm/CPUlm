@@ -22,11 +22,13 @@ def mul(a, b):
     n = a.bus_size
 
     result = b[0] & a[n-1]
-    c = Constant("0")
+    c = a[n-1] & or_n_bits(b[1:n])
     for i in range(1,n):
         assert(result.bus_size == i)
         result = Constant("0") + result
         result_si_ajout,c_i = n_adder(result, b[0:i+1])
+        if i+1 < n:
+            c_i = c_i | or_n_bits(b[i+1:n])
         result = mux(a[n-i-1], result, result_si_ajout)
         c = mux(a[n-i-1],c, c|c_i)
     return (result,c)
