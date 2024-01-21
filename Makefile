@@ -11,4 +11,15 @@ clean:
 test: cpulm.net
 	./run_tests.sh
 
+chrono:
+	./../Assembler/asm chrono.ulm
+	make build file=../CPUlm/cpulm.net -C ../SimulateurC
+	time ./../SimulateurC/build/a.out -p chrono.po -d chrono.do > tmp
+	rm -f chrono.do
+	rm -f chrono.po
+	cat tmp
+
+a:
+	time grep "aa" cpulm.net
+
 .PHONY: all clean
