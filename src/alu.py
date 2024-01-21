@@ -21,14 +21,20 @@ def mul(a, b):
     assert(a.bus_size == b.bus_size)
     n = a.bus_size
 
+    or_lst = [b[n-1]]
+    for i in range(1,n-1):
+        new_or = or_lst[0] | b[n-i-1]
+        or_lst.insert(0,new_or)
+    # or_lst[i] contient or_n_bits(b[i+1:n])
+
     result = b[0] & a[n-1]
-    c = a[n-1] & or_n_bits(b[1:n])
+    c = a[n-1] & or_lst[0]
     for i in range(1,n):
         assert(result.bus_size == i)
         result = Constant("0") + result
         result_si_ajout,c_i = n_adder(result, b[0:i+1])
         if i+1 < n:
-            c_i = c_i | or_n_bits(b[i+1:n])
+            c_i = c_i | or_lst[i]
         result = mux(a[n-i-1], result, result_si_ajout)
         c = mux(a[n-i-1],c, c|c_i)
     return (result,c)
