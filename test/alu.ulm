@@ -1,0 +1,21 @@
+.text
+
+main:
+    loadi r2 3
+    loadi r3 1
+loop1:
+    sub r3 r2 r3
+    mul r2 r2 r3
+    jmp.c $end_loop1
+    jmp $loop1
+end_loop1:
+    loadi r2 7
+    loadi r3 60
+loop2:
+    inc r2 r2
+    sub r3 r3 r2
+    jmp.c $end
+    jmp $loop2
+end:
+    halt
+

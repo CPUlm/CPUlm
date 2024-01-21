@@ -75,7 +75,7 @@ def alu(instruction, rs1, rs2):
 
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
-    flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, c_sub, c_mul, Constant("0")))
+    flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, ~c_sub, c_mul, Constant("0")))
 
     flag_v = mux_n(alucode[0:3], (Constant("0"),
                                   Constant("0"),
