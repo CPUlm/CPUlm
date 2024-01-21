@@ -63,7 +63,7 @@ def main():
     rs1 = get_reg(id_rs1, regs_old)
     rs2 = get_reg(id_rs2, regs_old)
     rd = get_reg(id_rd, regs_old)
-    pc_if_incr,carry = incr(pc_old)
+    pc_if_incr = incr(pc_old)
 
     # chacune renvoie un n-uplet contenant les nouvelles valeur
 
@@ -126,5 +126,3 @@ def main():
     r6.set_as_output("r6")
     r28.set_as_output("rout")
     r31.set_as_output("rpriv")
-
-

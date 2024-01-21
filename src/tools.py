@@ -99,12 +99,14 @@ def incr(a):
     assert(a.bus_size >= 1)
     s = ~a[0]
     c = a[0]
-    for i in range(1, a.bus_size):
+    for i in range(1, a.bus_size-1):
         s_i = a[i] ^ c
         c = a[i] & c
         s = s + s_i
+    s_i = a[a.bus_size-1] ^ c
+    s = s + s_i
     assert_same_type(a, s)
-    return (s,c)
+    return s
 
 def full_adder(a, b, c):
     tmp = a ^ b
@@ -120,7 +122,4 @@ def n_adder_carry(a, b, c):
 
 def n_adder(a,b):
     return n_adder_carry(a,b,Constant("0"))
-
-def negation(a):
-    return incr(~a)
 
