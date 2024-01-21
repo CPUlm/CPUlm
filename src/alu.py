@@ -49,15 +49,22 @@ def or_n_bits(a):
     return r
 
 
+
 def div(dividende, diviseur):
     # il s'agit de l'algorithme de division standard (celui qu'on pose à la main)
     # on considère donc de plus en plus de bits du quotient, et on soustrait le diviseur quand c'est possible
     assert(dividende.bus_size == diviseur.bus_size)
     n = dividende.bus_size
 
+    or_lst = [diviseur[n-1]]
+    for i in range(1,n-1):
+        new_or = or_lst[0] | diviseur[n-i-1]
+        or_lst.insert(0,new_or)
+    # or_lst[i] contient or_n_bits(diviseur[i+1:n])
+
     # comme il est impossible d'initialiser les variables à Constant(""), ces quelques lignes simulent la première itération de la boucle
     dividende_rogne = dividende[n-1]
-    trop_court = or_n_bits(diviseur[1:n])   # les seuls nombre restants possibles sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
+    trop_court = or_lst[0]   # les seuls nombre restants possibles sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
     plus_grand = (~trop_court) & dividende_rogne
     quotient = plus_grand
     dividende_rogne = mux(plus_grand, dividende_rogne, Constant("0"))
@@ -69,9 +76,8 @@ def div(dividende, diviseur):
         #  on a donc déjà calculé les i premiers bits du quotient
 
         dividende_rogne = dividende[n-i-1] + dividende_rogne                   # le nouveau dividende
-        trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
-        neg_div,_ = negation(diviseur[0:i+1])                                   
-        diff,carry_neg = n_adder(dividende_rogne, neg_div)                              # resultat si on fait la soustraction
+        trop_court = or_lst[i] if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
+        diff,carry_neg = n_adder_carry(dividende_rogne, ~diviseur[0:i+1], Constant("1"))                              # resultat si on fait la soustraction
 
         plus_grand = (~trop_court) & (carry_neg)   # indique si il y a assez de bits et que le resultat de la soustraction est positif
 
@@ -79,6 +85,7 @@ def div(dividende, diviseur):
         dividende_rogne = mux(plus_grand, dividende_rogne, diff)
     assert(quotient.bus_size == dividende.bus_size)
     return quotient
+
 
 def alu(instruction, rs1, rs2):
     alucode = instruction[OPCODE_BITS + 3*REG_BITS : OPCODE_BITS + 3*REG_BITS + ALU_BITS]
