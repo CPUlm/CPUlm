@@ -73,13 +73,8 @@ def main():
     jmp_set = jmp(instruction, rd, flags_old, pc_old)  # renvoie (pc,)
 
     # calcul deplaces :
-    ##regs_alu = update_regs(regs_old, id_rd, alu_set[0])
-    ##regs_shift = update_regs(regs_old, id_rd, shift_set[0])
-    ##regs_load_store = update_regs(regs_old, id_rd, load_store_set[0])
-
     rd_if_change = mux_alu_shift_load(opcode, alu_set[0], shift_set[0], load_store_set[0])
     regs_if_change = update_regs(regs_old, id_rd, rd_if_change)
-    #regs_if_change = mux_alu_shift_load(opcode, regs_alu, regs_shift, regs_load_store)
 
     # selection du resultat grace a l'opcode et les resultats recus
 
@@ -93,7 +88,6 @@ def main():
     flag_v = flags[3]
 
     regs = mux_jmp(opcode, regs_if_change, regs_old)
-    #regs = mux_opcode(opcode, regs_if_change, regs_if_change, regs_if_change, regs_old)
     r2 = regs[0]
     r3 = regs[1]
     r4 = regs[2]

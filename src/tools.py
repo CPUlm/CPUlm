@@ -83,8 +83,7 @@ def mux_alu(opcode, not_alu, is_alu):
     return mux(opcode[0] | opcode[1] | opcode[2] | opcode[3], is_alu, not_alu)
 
 def mux_alu_shift_load(opcode, alu, shift, load_store):
-    # TODO optimiser
-    return mux_opcode(opcode, alu, shift, load_store, load_store)
+    return mux(opcode[2], mux(opcode[0] | opcode[1], alu, shift), load_store)
 
 def mux_opcode(opcode, alu, shift, load_store, jmp):
     as_or_lj = opcode[2] | opcode[3]
