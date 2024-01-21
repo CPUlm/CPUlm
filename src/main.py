@@ -51,18 +51,40 @@ def main():
     instruction = ROM(WORD_SIZE, WORD_SIZE, pc_old)
     opcode = instruction[0 : OPCODE_BITS]
 
+
+    # extraction de registres ...
+
+
     # calcul du resultat pour chaque instruction possible
+
+    id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
+    id_rs1 = instruction[OPCODE_BITS+REG_BITS : OPCODE_BITS+2*REG_BITS]
+    id_rs2 = instruction[OPCODE_BITS+2*REG_BITS : OPCODE_BITS+3*REG_BITS]
+    rs1 = get_reg(id_rs1, regs_old)
+    rs2 = get_reg(id_rs2, regs_old)
+    rd = get_reg(id_rd, regs_old)
+
+
     # chacune renvoie un n-uplet contenant les nouvelles valeur
 
-    alu_set = alu(instruction, regs_old)                     # renvoie (regs, flags)
-    shift_set = shift(instruction, regs_old)                 # renvoie (regs) sous forme de 1-uplet
-    load_store_set = load_store(instruction, regs_old)       # renvoie (regs)
-    jmp_set = jmp(instruction, regs_old, flags_old, pc_old)  # renvoie (regs, pc)
+    alu_set = alu(instruction, rs1, rs2)                     # renvoie (rd, flags)
+    shift_set = shift(instruction, rs1, rs2)                 # renvoie (rd,)
+    load_store_set = load_store(instruction, rd, rs1)        # renvoie (regs,)
+    jmp_set = jmp(instruction, rd, flags_old, pc_old)  # renvoie (pc,)
+
+    # calcul deplaces :
+    ##regs_alu = update_regs(regs_old, id_rd, alu_set[0])
+    ##regs_shift = update_regs(regs_old, id_rd, shift_set[0])
+    ##regs_load_store = update_regs(regs_old, id_rd, load_store_set[0])
+
+    rd_if_change = mux_alu_shift_load(opcode, alu_set[0], shift_set[0], load_store_set[0])
+    regs_if_change = update_regs(regs_old, id_rd, rd_if_change)
+    #regs_if_change = mux_alu_shift_load(opcode, regs_alu, regs_shift, regs_load_store)
 
     # selection du resultat grace a l'opcode et les resultats recus
 
     pc_if_incr,carry = incr(pc_old)
-    pc = mux_jmp(opcode, pc_if_incr, jmp_set[1])
+    pc = mux_jmp(opcode, pc_if_incr, jmp_set[0])
 
     flags = mux_alu(opcode, flags_old, alu_set[1])
     flag_z = flags[0]
@@ -70,7 +92,8 @@ def main():
     flag_c = flags[2]
     flag_v = flags[3]
 
-    regs = mux_opcode(opcode, alu_set[0], shift_set[0], load_store_set[0], jmp_set[0])
+    regs = mux_jmp(opcode, regs_if_change, regs_old)
+    #regs = mux_opcode(opcode, regs_if_change, regs_if_change, regs_if_change, regs_old)
     r2 = regs[0]
     r3 = regs[1]
     r4 = regs[2]

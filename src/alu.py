@@ -56,14 +56,9 @@ def div(dividende, diviseur):
     assert(quotient.bus_size == dividende.bus_size)
     return quotient
 
-def alu(instruction, regs_old):
-    id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
-    id_rs1 = instruction[OPCODE_BITS+REG_BITS : OPCODE_BITS+2*REG_BITS]
-    id_rs2 = instruction[OPCODE_BITS+2*REG_BITS : OPCODE_BITS+3*REG_BITS]
+def alu(instruction, rs1, rs2):
     alucode = instruction[OPCODE_BITS + 3*REG_BITS : OPCODE_BITS + 3*REG_BITS + ALU_BITS]
     
-    rs1 = get_reg(id_rs1, regs_old)
-    rs2 = get_reg(id_rs2, regs_old)
     rs2_neg,rs2_neg_carry = negation(rs2)
 
     rd_and = rs1 & rs2
@@ -77,7 +72,6 @@ def alu(instruction, regs_old):
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
 
-    regs_new = update_regs(regs_old, id_rd, rd)
 
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
@@ -95,4 +89,4 @@ def alu(instruction, regs_old):
     
     new_flags = (flag_z, flag_n, flag_c, flag_v )
 
-    return (regs_new, new_flags)
+    return (rd, new_flags)
