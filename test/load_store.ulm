@@ -1,0 +1,14 @@
+.text
+
+main:
+    add r2 r1 r1
+    store r2 r1
+    load r3 r2
+    sub r4 r3 r1
+    jmp.z $success
+    loadi rout 0
+    jmp $end
+success:
+    loadi rout 1
+end:
+    halt
