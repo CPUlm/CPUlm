@@ -74,7 +74,10 @@ def main():
 
     # calcul deplaces :
     rd_if_change = mux_alu_shift_load(opcode, alu_set[0], shift_set[0], load_store_set[0])
-    regs_if_change = update_regs(regs_old, id_rd, rd_if_change)
+    new_rd = mux_jmp(opcode, rd_if_change, rd)
+    ##regs_if_change = update_regs(regs_old, id_rd, rd_if_change)
+
+    rd_one_hot = one_hot(id_rd)
 
     # selection du resultat grace a l'opcode et les resultats recus
 
@@ -86,37 +89,37 @@ def main():
     flag_c = flags[2]
     flag_v = flags[3]
 
-    regs = mux_jmp(opcode, regs_if_change, regs_old)
-    r2 = regs[0]
-    r3 = regs[1]
-    r4 = regs[2]
-    r5 = regs[3]
-    r6 = regs[4]
-    r7 = regs[5]
-    r8 = regs[6]
-    r9 = regs[7]
-    r10 = regs[8]
-    r11 = regs[9]
-    r12 = regs[10]
-    r13 = regs[11]
-    r14 = regs[12]
-    r15 = regs[13]
-    r16 = regs[14]
-    r17 = regs[15]
-    r18 = regs[16]
-    r19 = regs[17]
-    r20 = regs[18]
-    r21 = regs[19]
-    r22 = regs[20]
-    r23 = regs[21]
-    r24 = regs[22]
-    r25 = regs[23]
-    r26 = regs[24]
-    r27 = regs[25]
-    r28 = regs[26]
-    r29 = regs[27]
-    r30 = regs[28]
-    r31 = regs[29]
+    #regs = mux_jmp(opcode, regs_if_change, regs_old)
+    r2 = mux(rd_one_hot[2], regs_old[0], new_rd)
+    r3 = mux(rd_one_hot[3], regs_old[1], new_rd)
+    r4 = mux(rd_one_hot[4], regs_old[2], new_rd)
+    r5 = mux(rd_one_hot[5], regs_old[3], new_rd)
+    r6 = mux(rd_one_hot[6], regs_old[4], new_rd)
+    r7 = mux(rd_one_hot[7], regs_old[5], new_rd)
+    r8 = mux(rd_one_hot[8], regs_old[6], new_rd)
+    r9 = mux(rd_one_hot[9], regs_old[7], new_rd)
+    r10 = mux(rd_one_hot[10], regs_old[8], new_rd)
+    r11 = mux(rd_one_hot[11], regs_old[9], new_rd)
+    r12 = mux(rd_one_hot[12], regs_old[10], new_rd)
+    r13 = mux(rd_one_hot[13], regs_old[11], new_rd)
+    r14 = mux(rd_one_hot[14], regs_old[12], new_rd)
+    r15 = mux(rd_one_hot[15], regs_old[13], new_rd)
+    r16 = mux(rd_one_hot[16], regs_old[14], new_rd)
+    r17 = mux(rd_one_hot[17], regs_old[15], new_rd)
+    r18 = mux(rd_one_hot[18], regs_old[16], new_rd)
+    r19 = mux(rd_one_hot[19], regs_old[17], new_rd)
+    r20 = mux(rd_one_hot[20], regs_old[18], new_rd)
+    r21 = mux(rd_one_hot[21], regs_old[19], new_rd)
+    r22 = mux(rd_one_hot[22], regs_old[20], new_rd)
+    r23 = mux(rd_one_hot[23], regs_old[21], new_rd)
+    r24 = mux(rd_one_hot[24], regs_old[22], new_rd)
+    r25 = mux(rd_one_hot[25], regs_old[23], new_rd)
+    r26 = mux(rd_one_hot[26], regs_old[24], new_rd)
+    r27 = mux(rd_one_hot[27], regs_old[25], new_rd)
+    r28 = mux(rd_one_hot[28], regs_old[26], new_rd)
+    r29 = mux(rd_one_hot[29], regs_old[27], new_rd)
+    r30 = mux(rd_one_hot[30], regs_old[28], new_rd)
+    r31 = mux(rd_one_hot[31], regs_old[29], new_rd)
 
     pc.set_as_output("pc")
     r2.set_as_output("r2")

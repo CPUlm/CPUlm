@@ -20,19 +20,6 @@ def assert_same_type(a, b):
 def get_reg(id_reg, regs):
     return mux_n(id_reg, ( Constant("0"*WORD_SIZE), Constant("0"*(WORD_SIZE-1)+"1")) + regs)
 
-def update_regs(regs_old, id_reg, regVal):
-    arr = [regs_old, regs_old]
-
-    for i in range(len(regs_old)):
-        deb = regs_old[0:i]
-        fin = regs_old[i+1:len(regs_old)]
-        arr.append( deb + (regVal,) + fin)
-
-    return mux_n(id_reg, arr)
-
-
-
-
 
 ### flags ###
 
@@ -50,6 +37,7 @@ def test_flags(flags, flagsMask):
 
 def mux(m, a, b):
     # pareil que MUX(m,a,b), mais a et b peuvent etre des tuples (donc remplace MUX)
+    # dans la pratique, le programme n'utilise plus de mux sur des tuple
     assert_same_type(a, b)
     if not isinstance(a, tuple):
         return Mux(m, a, b)
@@ -123,3 +111,13 @@ def n_adder_carry(a, b, c):
 def n_adder(a,b):
     return n_adder_carry(a,b,Constant("0"))
 
+def one_hot(a):
+    m = a.bus_size
+    res = mux(a[0], Constant("01"), Constant("10"))
+    
+    for i in range(1,m):
+        assert(res.bus_size == 2**i)
+        zn = Constant("0"*(2**i))
+        res = mux(a[i], res+zn, zn+res)
+    assert(res.bus_size == 2**m)
+    return res
