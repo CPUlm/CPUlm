@@ -54,9 +54,6 @@ def main():
 
     # extraction de registres ...
 
-
-    # calcul du resultat pour chaque instruction possible
-
     id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
     id_rs1 = instruction[OPCODE_BITS+REG_BITS : OPCODE_BITS+2*REG_BITS]
     id_rs2 = instruction[OPCODE_BITS+2*REG_BITS : OPCODE_BITS+3*REG_BITS]
@@ -65,6 +62,7 @@ def main():
     rd = get_reg(id_rd, regs_old)
     pc_if_incr = incr(pc_old)
 
+    # calcul du resultat pour chaque instruction possible
     # chacune renvoie un n-uplet contenant les nouvelles valeur
 
     alu_set = alu(instruction, rs1, rs2)                     # renvoie (rd, flags)
@@ -75,7 +73,6 @@ def main():
     # calcul deplaces :
     rd_if_change = mux_alu_shift_load(opcode, alu_set[0], shift_set[0], load_store_set[0])
     new_rd = mux_jmp(opcode, rd_if_change, rd)
-    ##regs_if_change = update_regs(regs_old, id_rd, rd_if_change)
 
     rd_one_hot = one_hot(id_rd)
 
@@ -89,7 +86,6 @@ def main():
     flag_c = flags[2]
     flag_v = flags[3]
 
-    #regs = mux_jmp(opcode, regs_if_change, regs_old)
     r2 = mux(rd_one_hot[2], regs_old[0], new_rd)
     r3 = mux(rd_one_hot[3], regs_old[1], new_rd)
     r4 = mux(rd_one_hot[4], regs_old[2], new_rd)
