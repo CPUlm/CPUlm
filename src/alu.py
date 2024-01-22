@@ -2,20 +2,6 @@ from constants import *
 from tools import *
 
 
-def big_adder(lst):
-    # retourne la somme de tous les elements de lst
-    n = len(lst)
-    assert(n > 0)
-    if n == 1:
-        return lst[0]
-    else:
-        m = n//2
-        s1 = big_adder(lst[0:m])
-        s2 = big_adder(lst[m:n])
-        s,c = n_adder(s1, s2)
-        return s
-
-
 def mul(a, b):
     assert(a.bus_size == b.bus_size)
     n = a.bus_size
@@ -26,7 +12,7 @@ def mul(a, b):
     for i in range(n):
         ajout = mux(a[i], zn, b)
         result,c_i = n_adder(result, ajout)
-        b = b[1:n] + Constant("0")
+        b = Constant("0") + b[0:n-1]
         c = c | c_i
         
     return (result,c)
@@ -58,17 +44,17 @@ def div(dividende, diviseur):
         #  on va faire l'étape où le dividende a i+1 bits
         #  on a donc déjà calculé les i premiers bits du quotient
 
-        dividende_rogne = dividende_rogne + dividende[n-i-1]                    # le nouveau dividende
+        dividende_rogne = dividende[n-i-1] + dividende_rogne                   # le nouveau dividende
         trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
         neg_div,_ = negation(diviseur[0:i+1])                                   
-        diff,_ = n_adder(dividende_rogne, neg_div)                              # resultat si on fait la soustraction
+        diff,carry_neg = n_adder(dividende_rogne, neg_div)                              # resultat si on fait la soustraction
 
-        plus_grand = (~trop_court) & diff[diff.bus_size-1]   # indique si il y a assez de bits et que le resultat de la soustraction est positif
+        plus_grand = (~trop_court) & (carry_neg)   # indique si il y a assez de bits et que le resultat de la soustraction est positif
 
-        quotient = quotient + plus_grand
+        quotient = plus_grand + quotient 
         dividende_rogne = mux(plus_grand, dividende_rogne, diff)
+    assert(quotient.bus_size == dividende.bus_size)
     return quotient
-
 
 def alu(instruction, regs_old):
     id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
@@ -86,31 +72,27 @@ def alu(instruction, regs_old):
     rd_xor = rs1 ^ rs2
     rd_add,c_add = n_adder(rs1, rs2)
     rd_sub,c_sub = n_adder(rs1, rs2_neg)
-    rd_mul,c_mul = mul(rs1, rs2) if WITH_MUL else rs1
-    rd_div = div(rs1, rs2) if WITH_DIV else rs1
+    rd_mul,c_mul = mul(rs1, rs2)
+    rd_div = div(rs1, rs2)
 
     rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
 
-    regs_new = update_regs(regs_old, id_rd, rd_add)
+    regs_new = update_regs(regs_old, id_rd, rd)
 
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
     flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, c_sub, c_mul, Constant("0")))
-    signe_rs1 = rs1[rs1.bus_size - 1]
-    signe_rs2 = rs2[rs2.bus_size - 1]
-    signe_rs2_neg = rs2_neg[rs2.bus_size - 1]
-    signe_rd = rd[rd.bus_size - 1]
 
     flag_v = mux_n(alucode[0:3], (Constant("0"),
                                   Constant("0"),
                                   Constant("0"),
                                   Constant("0"),
-                                  (signe_rs1^signe_rs2) | ((~signe_rs1)^signe_rd),  # addition : il y a overflow si les nombre que l'on additionne sont de même signe et que le résultat n'est pas du même signe
-                                  rs2_neg_carry | (signe_rs1 ^ signe_rs2_neg) | ((~signe_rs1)^signe_rd),  # soustratction : de même mais avec le nombre négatif associé 
+            (~rs1[rs1.bus_size-1] & ~rs2[rs2.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2[rs2.bus_size-1] & ~rd[rd.bus_size-1]),
+            (~rs1[rs1.bus_size-1] & ~rs2_neg[rs2_neg.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2_neg[rs2_neg.bus_size-1] & ~rd[rd.bus_size-1]),
                                   Constant("0"),
                                   Constant("0")))
 
     
     new_flags = (flag_z, flag_n, flag_c, flag_v )
 
-    return (regs_old, new_flags)
+    return (regs_new, new_flags)

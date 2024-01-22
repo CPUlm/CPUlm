@@ -15,11 +15,11 @@ def shift(instruction, regs_old):
     rs2 = get_reg(id_rs2, regs_old)[0:m]
 
 
-    # Logical Shift Right:
+    # Logical Shift Left:
     lsl_lst = [rs1]
     for i in range(1,n):
         z_i = Constant("0"*i)
-        lsl_lst.append( rs1[i:n] + z_i )
+        lsl_lst.append( z_i + rs1[0:n-i] )
     lsl = mux_n(rs2, lsl_lst)
     lsl_regs = update_regs(regs_old, id_rd, lsl)
 
@@ -27,7 +27,7 @@ def shift(instruction, regs_old):
     lsr_lst = [rs1]
     for i in range(1,n):
         z_i = Constant("0"*i)
-        lsr_lst.append( z_i + rs1[0:n-i] )
+        lsr_lst.append( rs1[i:n] + z_i )
     lsr = mux_n(rs2, lsr_lst)
     lsr_regs = update_regs(regs_old, id_rd, lsr)
 
@@ -36,7 +36,7 @@ def shift(instruction, regs_old):
     asr1_lst = [rs1]            # dans le cas ou le bit de poids fort est 1
     for i in range(1,n):
         o_i = Constant("1"*i)
-        asr1_lst.append( o_i + rs1[0:n-i] )
+        asr1_lst.append( rs1[i:n] + o_i )
     asr1 = mux_n(rs2, asr1_lst)
     asr_regs = update_regs(regs_old, id_rd, mux(rs1[n-1],lsr,asr1))
     

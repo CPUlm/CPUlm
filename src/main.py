@@ -61,7 +61,7 @@ def main():
 
     # selection du resultat grace a l'opcode et les resultats recus
 
-    pc_if_incr,_ = incr(pc_old)
+    pc_if_incr,carry = incr(pc_old)
     pc = mux_jmp(opcode, pc_if_incr, jmp_set[1])
 
     flags = mux_alu(opcode, flags_old, alu_set[1])
@@ -90,15 +90,25 @@ def main():
     r18 = regs[16]
     r19 = regs[17]
     r20 = regs[18]
-    r21 = regs[18]
-    r22 = regs[19]
-    r23 = regs[20]
-    r24 = regs[21]
-    r25 = regs[22]
-    r26 = regs[23]
-    r27 = regs[24]
-    r28 = regs[25]
-    r29 = regs[26]
-    r30 = regs[27]
-    r31 = regs[28]
+    r21 = regs[19]
+    r22 = regs[20]
+    r23 = regs[21]
+    r24 = regs[22]
+    r25 = regs[23]
+    r26 = regs[24]
+    r27 = regs[25]
+    r28 = regs[26]
+    r29 = regs[27]
+    r30 = regs[28]
+    r31 = regs[29]
+
+    pc.set_as_output("pc")
+    r2.set_as_output("r2")
+    r3.set_as_output("r3")
+    r4.set_as_output("r4")
+    r5.set_as_output("r5")
+    r6.set_as_output("r6")
+    r28.set_as_output("rout")
+    r31.set_as_output("rpriv")
+
 
