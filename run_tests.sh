@@ -5,8 +5,12 @@ sed -i -e '$a\    \pc.set_as_output("pc");r2.set_as_output("r2");r3.set_as_outpu
 
 
 make
-make build file=../CPUlm/cpulm.net -C ../CSimulator
+mkdir -p build
+make -C ../CSimulator
+make -C ../Assembler
 
+../CSimulator/csimulator --disable-screen cpulm.net build
+cd build/ && clang -g *.c && cd ..
 
 red='\033[0;31m'
 noColor='\033[0m'
@@ -16,7 +20,7 @@ for ulmFile in test/*.ulm; do
 	echo -en "${red}"
 	./../Assembler/asm $ulmFile
 	echo -en "${red}"
-    diff -w -B <(./../CSimulator/build/a.out -p ${ulmFile/.ulm/.po} -d ${ulmFile/.ulm/.do}) ${ulmFile/.ulm/.out} 
+    diff -w -B <(./../CSimulator/build/a.out -p ${ulmFile/.ulm/.po} -d ${ulmFile/.ulm/.do}) ${ulmFile/.ulm/.out} -q
 	echo -en "${noColor}"
 done
 
