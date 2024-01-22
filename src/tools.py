@@ -37,7 +37,6 @@ def test_flags(flags, flagsMask):
 
 def mux(m, a, b):
     # pareil que MUX(m,a,b), mais a et b peuvent etre des tuples (donc remplace MUX)
-    # dans la pratique, le programme n'utilise plus de mux sur des tuple
     assert_same_type(a, b)
     if not isinstance(a, tuple):
         return Mux(m, a, b)
