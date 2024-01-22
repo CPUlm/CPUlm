@@ -1,0 +1,10 @@
+.text
+
+main:
+    add r2 r1 r2
+    sub r3 r1 r1
+    asr r4 r1 r1
+    load r3 r0
+    load r3 r1
+    load r3 r2
+    halt

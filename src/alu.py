@@ -5,17 +5,26 @@ from tools import *
 def mul(a, b):
     assert(a.bus_size == b.bus_size)
     n = a.bus_size
-    zn = Constant("0"*n)
 
-    result = zn
-    c = Constant("0")
-    for i in range(n):
-        ajout = mux(a[i], zn, b)
-        result,c_i = n_adder(result, ajout)
-        b = Constant("0") + b[0:n-1]
-        c = c | c_i
-        
+    or_lst = [b[n-1]]
+    for i in range(1,n-1):
+        new_or = or_lst[0] | b[n-i-1]
+        or_lst.insert(0,new_or)
+    # or_lst[i] contient or_n_bits(b[i+1:n])
+
+    result = b[0] & a[n-1]
+    c = a[n-1] & or_lst[0]
+    for i in range(1,n):
+        assert(result.bus_size == i)
+        result = Constant("0") + result
+        result_si_ajout,c_i = n_adder(result, b[0:i+1])
+        if i+1 < n:
+            c_i = c_i | or_lst[i]
+        result = mux(a[n-i-1], result, result_si_ajout)
+        c = mux(a[n-i-1],c, c|c_i)
     return (result,c)
+
+
 
 
 def or_n_bits(a):
@@ -25,15 +34,22 @@ def or_n_bits(a):
     return r
 
 
+
 def div(dividende, diviseur):
     # il s'agit de l'algorithme de division standard (celui qu'on pose à la main)
     # on considère donc de plus en plus de bits du quotient, et on soustrait le diviseur quand c'est possible
     assert(dividende.bus_size == diviseur.bus_size)
     n = dividende.bus_size
 
+    or_lst = [diviseur[n-1]]
+    for i in range(1,n-1):
+        new_or = or_lst[0] | diviseur[n-i-1]
+        or_lst.insert(0,new_or)
+    # or_lst[i] contient or_n_bits(diviseur[i+1:n])
+
     # comme il est impossible d'initialiser les variables à Constant(""), ces quelques lignes simulent la première itération de la boucle
     dividende_rogne = dividende[n-1]
-    trop_court = or_n_bits(diviseur[1:n])   # les seuls nombre restants possibles sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
+    trop_court = or_lst[0]   # les seuls nombre restants possibles sont 0 (on ignore) et 1 (on suppose donc qu'on divise par 1)
     plus_grand = (~trop_court) & dividende_rogne
     quotient = plus_grand
     dividende_rogne = mux(plus_grand, dividende_rogne, Constant("0"))
@@ -45,9 +61,8 @@ def div(dividende, diviseur):
         #  on a donc déjà calculé les i premiers bits du quotient
 
         dividende_rogne = dividende[n-i-1] + dividende_rogne                   # le nouveau dividende
-        trop_court = or_n_bits(diviseur[i+1:n]) if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
-        neg_div,_ = negation(diviseur[0:i+1])                                   
-        diff,carry_neg = n_adder(dividende_rogne, neg_div)                              # resultat si on fait la soustraction
+        trop_court = or_lst[i] if i+1 != n else Constant("0")  # indique si il n'y a pas assez de bits pour faire la soustraction
+        diff,carry_neg = n_adder_carry(dividende_rogne, ~diviseur[0:i+1], Constant("1"))                              # resultat si on fait la soustraction
 
         plus_grand = (~trop_court) & (carry_neg)   # indique si il y a assez de bits et que le resultat de la soustraction est positif
 
@@ -56,43 +71,34 @@ def div(dividende, diviseur):
     assert(quotient.bus_size == dividende.bus_size)
     return quotient
 
-def alu(instruction, regs_old):
-    id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
-    id_rs1 = instruction[OPCODE_BITS+REG_BITS : OPCODE_BITS+2*REG_BITS]
-    id_rs2 = instruction[OPCODE_BITS+2*REG_BITS : OPCODE_BITS+3*REG_BITS]
+
+def alu(instruction, rs1, rs2):
     alucode = instruction[OPCODE_BITS + 3*REG_BITS : OPCODE_BITS + 3*REG_BITS + ALU_BITS]
     
-    rs1 = get_reg(id_rs1, regs_old)
-    rs2 = get_reg(id_rs2, regs_old)
-    rs2_neg,rs2_neg_carry = negation(rs2)
+    add_or_sub = alucode[0]
+    rs2_to_add = mux(add_or_sub,rs2,~rs2)
 
     rd_and = rs1 & rs2
     rd_or = rs1 | rs2
     rd_nor = ~rd_or
     rd_xor = rs1 ^ rs2
-    rd_add,c_add = n_adder(rs1, rs2)
-    rd_sub,c_sub = n_adder(rs1, rs2_neg)
+    rd_add,c_add = n_adder_carry(rs1, rs2_to_add, add_or_sub)
     rd_mul,c_mul = mul(rs1, rs2)
     rd_div = div(rs1, rs2)
 
-    rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_sub, rd_mul, rd_div))
+    rd = mux_n(alucode[0:3], (rd_and, rd_or, rd_nor, rd_xor, rd_add, rd_add, rd_mul, rd_div))
 
-    regs_new = update_regs(regs_old, id_rd, rd)
 
     flag_z = ~or_n_bits(rd)
     flag_n = rd[rd.bus_size-1]
-    flag_c = mux_n(alucode[0:3], (Constant("0"), Constant("0"), Constant("0"), Constant("0"), c_add, c_sub, c_mul, Constant("0")))
+    flag_c = mux(alucode[2], Constant("0"), mux_n(alucode[0:2], (c_add, ~c_add, c_mul, Constant("0"))))
 
-    flag_v = mux_n(alucode[0:3], (Constant("0"),
-                                  Constant("0"),
-                                  Constant("0"),
-                                  Constant("0"),
-            (~rs1[rs1.bus_size-1] & ~rs2[rs2.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2[rs2.bus_size-1] & ~rd[rd.bus_size-1]),
-            (~rs1[rs1.bus_size-1] & ~rs2_neg[rs2_neg.bus_size-1] & rd[rd.bus_size-1]) | (rs1[rs1.bus_size-1] & rs2_neg[rs2_neg.bus_size-1] & ~rd[rd.bus_size-1]),
-                                  Constant("0"),
-                                  Constant("0")))
+    assert(rs1.bus_size == rs2.bus_size == rd.bus_size == rs2_to_add.bus_size)
+    size = rs2.bus_size
+    carry_v_add = (~rs1[size-1] & ~rs2_to_add[size-1] & rd[size-1]) | (rs1[size-1] & rs2_to_add[size-1] & ~rd[size-1])
+    flag_v = mux(alucode[2], Constant("0"), mux(alucode[1], carry_v_add, Constant("0")))
 
     
     new_flags = (flag_z, flag_n, flag_c, flag_v )
 
-    return (regs_new, new_flags)
+    return (rd, new_flags)
