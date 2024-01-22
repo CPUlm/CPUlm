@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+sed -i -e '$a\    \pc.set_as_output("pc");r2.set_as_output("r2");r3.set_as_output("r3");r4.set_as_output("r4");r5.set_as_output("r5");r6.set_as_output("r6");r28.set_as_output("rout");r31.set_as_output("rpriv")  ### for the test ###' src/main.py
+
+
 make
 make build file=../CPUlm/cpulm.net -C ../CSimulator
 
@@ -16,5 +20,8 @@ for ulmFile in test/*.ulm; do
 	echo -en "${noColor}"
 done
 
+sed -i '/### for the test ###/d' src/main.py 
 rm -rf test/*.do
 rm -rf test/*.po
+
+
