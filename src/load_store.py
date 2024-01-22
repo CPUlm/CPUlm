@@ -13,7 +13,7 @@ def load_store(instruction, rd, rs):
     rd_imm,_ = n_adder(imm_dec, rs)
     
     
-    write_enable = instruction[1]
+    write_enable = ~instruction[0] & instruction[1] & instruction[2] & ~instruction[3]
     rd_load = RAM(WORD_SIZE, WORD_SIZE, rs, write_enable, rd, rs)
 
     new_rd = mux(ram_is_untouched, mux(write_enable, rd_load, rd), rd_imm)
