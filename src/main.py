@@ -67,7 +67,7 @@ def main():
 
     alu_set = alu(instruction, rs1, rs2)                     # renvoie (rd, flags)
     shift_set = shift(instruction, rs1, rs2)                 # renvoie (rd,)
-    load_store_set = load_store(instruction, rd, rs1)        # renvoie (regs,)
+    load_store_set = load_store(instruction, rd, rs1)        # renvoie (rd,)
     jmp_set = jmp(instruction, rd, flags_old, pc_old, pc_if_incr)  # renvoie (pc,)
 
     # calcul deplaces :
