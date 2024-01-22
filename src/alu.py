@@ -2,21 +2,6 @@ from constants import *
 from tools import *
 
 
-def mul_old(a, b):
-    assert(a.bus_size == b.bus_size)
-    n = a.bus_size
-    zn = Constant("0"*n)
-
-    result = zn
-    c = Constant("0")
-    for i in range(n):
-        ajout = mux(a[i], zn, b)
-        result,c_i = n_adder(result, ajout)
-        b = Constant("0") + b[0:n-1]
-        c = c | c_i
-        
-    return (result,c)
-
 def mul(a, b):
     assert(a.bus_size == b.bus_size)
     n = a.bus_size
