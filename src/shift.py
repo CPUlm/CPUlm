@@ -3,17 +3,9 @@ from tools import *
 from math import *
 
 
-def shift(instruction, regs_old):
-
-    id_rd = instruction[OPCODE_BITS : OPCODE_BITS+REG_BITS]
-    id_rs1 = instruction[OPCODE_BITS+REG_BITS : OPCODE_BITS+2*REG_BITS]
-    id_rs2 = instruction[OPCODE_BITS+2*REG_BITS : OPCODE_BITS+3*REG_BITS]
-    
-    rs1 = get_reg(id_rs1, regs_old)
+def shift(instruction, rs1, rs2):
     n = rs1.bus_size
-    m = round(log2(n))
-    rs2 = get_reg(id_rs2, regs_old)[0:m]
-
+    rs2 = rs2[0:5]
 
     # Logical Shift Left:
     lsl_lst = [rs1]
@@ -21,7 +13,6 @@ def shift(instruction, regs_old):
         z_i = Constant("0"*i)
         lsl_lst.append( z_i + rs1[0:n-i] )
     lsl = mux_n(rs2, lsl_lst)
-    lsl_regs = update_regs(regs_old, id_rd, lsl)
 
     # Logical Shift Right
     lsr_lst = [rs1]
@@ -29,7 +20,6 @@ def shift(instruction, regs_old):
         z_i = Constant("0"*i)
         lsr_lst.append( rs1[i:n] + z_i )
     lsr = mux_n(rs2, lsr_lst)
-    lsr_regs = update_regs(regs_old, id_rd, lsr)
 
 
     # Arithmetic Shift Right :
@@ -38,9 +28,9 @@ def shift(instruction, regs_old):
         o_i = Constant("1"*i)
         asr1_lst.append( rs1[i:n] + o_i )
     asr1 = mux_n(rs2, asr1_lst)
-    asr_regs = update_regs(regs_old, id_rd, mux(rs1[n-1],lsr,asr1))
+    asr = mux(rs1[n-1],lsr,asr1)
     
     # mux :
-    regs_new = mux(instruction[0], asr_regs, mux(instruction[1], lsl_regs, lsr_regs))
+    rd = mux(instruction[0], asr, mux(instruction[1], lsl, lsr))
     
-    return (regs_new,)
+    return (rd,)
