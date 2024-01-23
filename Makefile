@@ -13,12 +13,19 @@ clean:
 test: cpulm.net
 	./run_tests.sh
 
-chrono: cpulm.net
-	@./../Assembler/asm chrono.ulm
-	@make build file=../CPUlm/cpulm.net -C ../CSimulator --silent
-	time ./../CSimulator/build/a.out -p chrono.po -d chrono.do
+assembler:
+	make -C ../Assembler
+
+csimulator:
+	make -C ../CSimulator
+
+chrono: cpulm.net assembler csimulator
+	@mkdir -p build
+	@../Assembler/asm chrono.ulm
+	@../CSimulator/csimulator --disable-screen cpulm.net build
+	@cd build/ && clang -g *.c
+	time build/a.out -p chrono.po -d chrono.do
 	@rm -f chrono.do
 	@rm -f chrono.po
-
 
 .PHONY: all clean
