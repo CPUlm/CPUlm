@@ -20,7 +20,7 @@ for ulmFile in test/*.ulm; do
 	echo -en "${red}"
 	./../Assembler/asm $ulmFile
 	echo -en "${red}"
-    diff -w -B <(./../CSimulator/build/a.out -p ${ulmFile/.ulm/.po} -d ${ulmFile/.ulm/.do}) ${ulmFile/.ulm/.out} -q
+    diff -w -B <(./build/a.out -p ${ulmFile/.ulm/.po} -d ${ulmFile/.ulm/.do}) ${ulmFile/.ulm/.out}
 	echo -en "${noColor}"
 done
 
